@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "@heroui/styles"; 
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+/*
+ * HeroUI Theme Customization
+ * Add this to your global.css after importing @heroui/styles
+ * Only includes variables users need to customize
+ * @see https://heroui.com/docs/react/getting-started/theming
+ */
+
+:root,
+.light,
+.default,
+[data-theme="light"],
+[data-theme="default"] {
+  /* Border Radius */
+  --radius: 0.125rem;
+  --field-radius: 0.5rem;
+}
