@@ -4,16 +4,14 @@ import { orpc } from "#/orpc/client";
 import { Table, Spinner, Typography, buttonVariants } from "@heroui/react";
 import {
   createColumnHelper,
-  createCoreRowModel,
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import type { InferRouterOutputs } from "@orpc/server";
-import type router from "#/orpc/router";
 import { PlusCircleIcon } from "lucide-react";
 import { ClinicStatusChips } from "#/components/clinics/status-chips.tsx";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
-import { EmptyTable } from "#/components/common/empty-table.tsx";
+import { EmptyTable } from "#/components/empty-table";
+import type { Clinic } from "#/orpc/schema";
 
 export const Route = createFileRoute("/_private/clinics")({
   component: RouteComponent,
@@ -23,14 +21,9 @@ export const Route = createFileRoute("/_private/clinics")({
     context.queryClient.query(orpc.listClinics.queryOptions()),
 });
 
-const features = tableFeatures({
-  coreRowModel: createCoreRowModel(),
-});
+const features = tableFeatures({});
 
-const columnHelper = createColumnHelper<
-  typeof features,
-  InferRouterOutputs<typeof router>["listClinics"]["data"][number]
->();
+const columnHelper = createColumnHelper<typeof features, Clinic>();
 const columns = columnHelper.columns([
   columnHelper.accessor("id", {
     header: "Unique ID",
@@ -72,13 +65,13 @@ function RouteComponent() {
   const table = useTable({
     features,
     columns,
-    data: clinics.data,
+    data: clinics,
     getRowId: (row) => row.id,
   });
 
   return (
     <AppPageLayout className="space-y-3">
-      <div className="flex justify-end mt-10">
+      <div className="flex justify-end">
         <Link
           className={buttonVariants({ fullWidth: false })}
           to="/clinics/new"

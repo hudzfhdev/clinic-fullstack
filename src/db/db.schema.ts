@@ -1,0 +1,58 @@
+import { sql } from "drizzle-orm";
+import { pgTable, uuid, text, timestamp, jsonb } from "drizzle-orm/pg-core";
+
+const timestamp_tz = () => ({
+  created_at: timestamp("created_at", {
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    withTimezone: true,
+    mode: "string",
+  })
+    .defaultNow()
+    .$onUpdate(() => sql`now()`)
+    .notNull(),
+});
+
+const address = () =>
+  jsonb().$type<{
+    address_one: string;
+    address_two?: string;
+    postcode: string;
+    state: string;
+    city: string;
+  }>();
+
+export const clinics = pgTable("clinics", {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  status: text().$type<"active" | "pending">().notNull().default("active"),
+  address: address(),
+  ...timestamp_tz(),
+});
+
+export const practitioners = pgTable("practitioners", {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  status: text().$type<"active" | "suspended" | "inactive">().notNull(),
+  gender: text().$type<"male" | "female" | "other">().notNull(),
+  dob: text().notNull(),
+  identification_no: text().notNull(),
+  address: address(),
+  phone_number: text().notNull(),
+  clinic_id: uuid().references(() => clinics.id),
+  specialty_id: uuid()
+    .references(() => practitioner_specialties.id)
+    .notNull(),
+  ...timestamp_tz(),
+});
+
+export const practitioner_specialties = pgTable("practitioner_specialties", {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  fields: jsonb().notNull().$type<Array<string>>(),
+  ...timestamp_tz(),
+});

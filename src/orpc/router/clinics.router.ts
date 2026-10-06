@@ -1,7 +1,8 @@
 import { db } from "#/db";
-import { clinics } from "#/db/schema.db.ts";
-import { os } from "@orpc/server";
+import { clinics } from "#/db/db.schema";
+import { ORPCError, os } from "@orpc/server";
 import { zClinicCreateSchema } from "../schema";
+import z from "zod";
 
 export const createClinic = os
   .input(zClinicCreateSchema)
@@ -14,10 +15,23 @@ export const createClinic = os
         address: input.address,
       })
       .returning();
-    return { data: created, error: null };
+    return created;
   });
 
 export const listClinics = os.handler(async () => {
   const listOfClinics = await db.query.clinics.findMany();
-  return { data: listOfClinics, error: null };
+  return listOfClinics;
 });
+
+export const getClinicByID = os
+  .input(z.object({ clinic_id: z.uuid() }))
+  .handler(async ({ input }) => {
+    const { clinic_id } = input;
+    const clinic = await db.query.clinics.findFirst({
+      where: (f, o) => o.eq(f.id, clinic_id),
+    });
+    if (!clinic) {
+      throw new ORPCError("NOT_FOUND", { message: "clinic not found." });
+    }
+    return clinic;
+  });

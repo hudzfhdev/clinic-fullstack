@@ -12,7 +12,7 @@ import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
 import { states } from "#/libs/address";
 import { zClinicCreateSchema } from "#/orpc/schema.ts";
-import type { ClinicCreateZodSchema } from "#/orpc/schema.ts";
+import type { ClinicCreateSchema } from "#/orpc/schema.ts";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
 
 export const Route = createFileRoute("/_private/clinics_/new")({
@@ -34,7 +34,7 @@ function RouteComponent() {
           return;
         }
 
-        if (data?.data) {
+        if (data) {
           toast.success(`Success`, {
             description: "New clinic has been added.",
           });
@@ -58,7 +58,7 @@ function RouteComponent() {
         state: "",
         note: "",
       },
-    } as ClinicCreateZodSchema,
+    } as ClinicCreateSchema,
     onSubmit({ value }) {
       console.log("submitted", value, sanitizeForm(value));
       clinicsMutation.mutate(sanitizeForm(value));

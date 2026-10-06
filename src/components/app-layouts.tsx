@@ -1,6 +1,11 @@
 import { Link as TRRLink } from "@tanstack/react-router";
 import { Drawer, Button, Link } from "@heroui/react";
-import { HospitalIcon, HouseIcon, MenuIcon } from "lucide-react";
+import {
+  HospitalIcon,
+  LayoutDashboardIcon,
+  MenuIcon,
+  StethoscopeIcon,
+} from "lucide-react";
 import { useState } from "react";
 import type { ComponentType, PropsWithChildren, SVGProps } from "react";
 import { cn } from "cn";
@@ -10,8 +15,9 @@ const navItems: {
   label: string;
   to: string;
 }[] = [
-  { icon: HouseIcon, label: "Dashboard", to: "/" },
+  { icon: LayoutDashboardIcon, label: "Dashboard", to: "/" },
   { icon: HospitalIcon, label: "Clinics", to: "/clinics" },
+  { icon: StethoscopeIcon, label: "Practitioners", to: "/practitioners" },
 ];
 
 export function AppPageLayout({
@@ -29,7 +35,12 @@ export function Sidebar() {
   const [open, setOpen] = useState(false);
   return (
     <Drawer isOpen={open} onOpenChange={setOpen}>
-      <Button size="sm" variant="ghost" isIconOnly>
+      <Button
+        size="sm"
+        variant="ghost"
+        isIconOnly
+        aria-label="toggle menu drawer"
+      >
         <MenuIcon />
       </Button>
       <Drawer.Backdrop variant="blur">

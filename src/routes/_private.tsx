@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_private")({
 function RouteComponent() {
   return (
     <div className="flex flex-col h-full">
-      <header className="flex justify-between p-3 shadow-md">
+      <header className="flex justify-between p-3 shadow-md sticky top-0 bg-white z-10">
         <Sidebar />
       </header>
       <Outlet />
