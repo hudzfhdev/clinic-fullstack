@@ -1,18 +1,19 @@
 import {
   createFileRoute,
   ErrorComponent,
+  Link,
   useNavigate,
 } from "@tanstack/react-router";
-import { AppPageLayout } from "../_private";
 import { useAppForm } from "#/components/forms/forms.util";
-import { Button, toast, Typography } from "@heroui/react";
+import { Button, buttonVariants, Form, toast, Typography } from "@heroui/react";
 import { HospitalIcon, HouseIcon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
-import { zClinicCreateSchema } from "#/orpc/schema";
-import type { InferredClinicCreateSchema } from "#/orpc/schema";
 import { sanitizeForm } from "#/utils/common";
 import { states } from "#/libs/address";
+import { zClinicCreateSchema } from "#/orpc/schema.ts";
+import type { ClinicCreateZodSchema } from "#/orpc/schema.ts";
+import { AppPageLayout } from "#/components/app-layouts.tsx";
 
 export const Route = createFileRoute("/_private/clinics_/new")({
   component: RouteComponent,
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/_private/clinics_/new")({
   errorComponent: ErrorComponent,
 });
 
-const statesOptions = states.map((v) => v.state);
+const statesOptions = states.map((v) => ({ label: v.state, value: v.state }));
 
 function RouteComponent() {
   const nav = useNavigate();
@@ -29,12 +30,14 @@ function RouteComponent() {
     orpc.createClinic.mutationOptions({
       onSettled: (data, err) => {
         if (err) {
-          toast.danger(`Something wrong`);
+          toast.danger(`Error`, { description: "Something wrong." });
           return;
         }
 
         if (data?.data) {
-          toast.success(`New clinic added`);
+          toast.success(`Success`, {
+            description: "New clinic has been added.",
+          });
           qc.invalidateQueries({ queryKey: orpc.listClinics.queryKey() });
           nav({ to: "/clinics" });
           return;
@@ -49,29 +52,28 @@ function RouteComponent() {
       status: "active",
       address: {
         address_one: "",
+        address_two: "",
         city: "",
         postcode: "",
         state: "",
         note: "",
       },
-    } as InferredClinicCreateSchema,
-    onSubmitInvalid(props) {
-      console.log(props);
-    },
-    canSubmitWhenInvalid: true,
+    } as ClinicCreateZodSchema,
     onSubmit({ value }) {
+      console.log("submitted", value, sanitizeForm(value));
       clinicsMutation.mutate(sanitizeForm(value));
     },
     validators: {
+      onChangeAsync: zClinicCreateSchema,
       onSubmitAsync: zClinicCreateSchema,
     },
   });
 
   return (
-    <AppPageLayout className="flex justify-center">
+    <AppPageLayout className="grid place-items-center">
       <form.AppForm>
-        <form
-          className="bg-white flex flex-col w-full gap-3 md:max-w-2xl p-6 rounded-xl shadow-2xl"
+        <Form
+          className="bg-white flex flex-col w-full gap-3 md:max-w-2xl p-6 rounded-xl shadow-xl"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit(e);
@@ -110,8 +112,8 @@ function RouteComponent() {
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-2 border-b py-2 border-b-accent-soft">
-              <HouseIcon size={18} />
-              <Typography type="h5">Address</Typography>
+              <HouseIcon size={17} />
+              <Typography>Address</Typography>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <form.AppField
@@ -141,10 +143,10 @@ function RouteComponent() {
               <form.AppField
                 name="address.state"
                 children={(field) => (
-                  <field.AppSelectField
+                  <field.AppComboBoxField
                     options={statesOptions}
-                    getLabel={(v) => v}
-                    getValue={(v) => v}
+                    getOptionLabel={(v) => v.label}
+                    getOptionValue={(v) => v.value}
                     label="State"
                     isRequired
                   />
@@ -152,10 +154,16 @@ function RouteComponent() {
               />
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Link
+              to="/clinics"
+              className={buttonVariants({ variant: "ghost" })}
+            >
+              Back
+            </Link>
             <Button type="submit">Add</Button>
           </div>
-        </form>
+        </Form>
       </form.AppForm>
     </AppPageLayout>
   );

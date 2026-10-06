@@ -1,5 +1,5 @@
 import { db } from "#/db";
-import { clinics } from "#/db/schema";
+import { clinics } from "#/db/schema.db.ts";
 import { os } from "@orpc/server";
 import { zClinicCreateSchema } from "../schema";
 

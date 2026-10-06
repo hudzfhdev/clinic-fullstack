@@ -6,7 +6,7 @@ export const zClinicCreateSchema = z.object({
   address: z
     .object({
       address_one: z.string().min(1),
-      address_two: z.string().min(1).nullable().optional(),
+      address_two: z.string().optional(),
       city: z.string().min(1),
       postcode: z.string().min(1),
       state: z.string().min(1),
@@ -14,4 +14,4 @@ export const zClinicCreateSchema = z.object({
     .optional(),
 });
 
-export type InferredClinicCreateSchema = z.infer<typeof zClinicCreateSchema>;
+export type ClinicCreateZodSchema = z.infer<typeof zClinicCreateSchema>;

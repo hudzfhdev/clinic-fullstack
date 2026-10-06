@@ -1,8 +1,7 @@
-import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
-import { AppPageLayout } from "../_private";
+import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
-import { Table, Spinner, Typography } from "@heroui/react";
+import { Table, Spinner, Typography, buttonVariants } from "@heroui/react";
 import {
   createColumnHelper,
   createCoreRowModel,
@@ -11,6 +10,10 @@ import {
 } from "@tanstack/react-table";
 import type { InferRouterOutputs } from "@orpc/server";
 import type router from "#/orpc/router";
+import { PlusCircleIcon } from "lucide-react";
+import { ClinicStatusChips } from "#/components/clinics/status-chips.tsx";
+import { AppPageLayout } from "#/components/app-layouts.tsx";
+import { EmptyTable } from "#/components/common/empty-table.tsx";
 
 export const Route = createFileRoute("/_private/clinics")({
   component: RouteComponent,
@@ -44,7 +47,7 @@ const columns = columnHelper.columns([
   columnHelper.accessor("status", {
     header: "Status",
     cell(rowInfo) {
-      return rowInfo.getValue();
+      return <ClinicStatusChips status={rowInfo.getValue()} />;
     },
   }),
   columnHelper.display({
@@ -74,7 +77,16 @@ function RouteComponent() {
   });
 
   return (
-    <AppPageLayout>
+    <AppPageLayout className="space-y-3">
+      <div className="flex justify-end mt-10">
+        <Link
+          className={buttonVariants({ fullWidth: false })}
+          to="/clinics/new"
+        >
+          <PlusCircleIcon />
+          Add Clinic
+        </Link>
+      </div>
       <Table>
         <Table.ScrollContainer>
           <Table.Content aria-label="list of clinics">
@@ -92,7 +104,7 @@ function RouteComponent() {
                 ))}
               </Table.Header>
             ))}
-            <Table.Body>
+            <Table.Body renderEmptyState={() => <EmptyTable />}>
               {table.getRowModel().rows.map((row) => (
                 <Table.Row key={row.id}>
                   {row.getAllCells().map((cell) => (

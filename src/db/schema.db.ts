@@ -17,7 +17,7 @@ const timestamp_tz = () => ({
 export const clinics = pgTable("clinics", {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
-  status: text().$type<"active" | "pending">().notNull(),
+  status: text().$type<"active" | "pending">().notNull().default("active"),
   address: jsonb().$type<{
     address_one: string;
     address_two?: string;

@@ -1,7 +1,8 @@
 @import "tailwindcss";
-@import "@heroui/styles"; 
+@import "@heroui/styles";
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }
@@ -21,4 +22,10 @@ html, body {
   /* Border Radius */
   --radius: 0.125rem;
   --field-radius: 0.5rem;
+}
+
+@layer components {
+  .chip {
+    @apply rounded-full;
+  }
 }

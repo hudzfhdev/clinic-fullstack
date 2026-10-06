@@ -9,6 +9,7 @@ import {
   ComboBox,
 } from "@heroui/react";
 import type { SelectProps, TextFieldProps } from "@heroui/react";
+import type { ComboBoxProps } from "@heroui/react/combo-box";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 
 export const formHookContexts = createFormHookContexts();
@@ -19,18 +20,10 @@ export const { useAppForm } = createFormHook({
   fieldComponents: {
     AppTextField,
     AppSelectField,
+    AppComboBoxField,
   },
   formComponents: {},
 });
-
-function getFieldError(field: any) {
-  return field.state.meta.errors.find((err) => {
-    if (err.path.length > 1) {
-      return err.path.join(".") === field.name;
-    }
-    return err.path.includes(field.name);
-  });
-}
 
 function AppTextField({
   label,
@@ -43,7 +36,14 @@ function AppTextField({
   description?: string | null;
 }) {
   const field = formHookContexts.useFieldContext<string>();
-  const error = getFieldError(field);
+  const error = field.state.meta.errors.find((err) => {
+    if (err.path.length > 1) {
+      return err.path.join(".") === field.name;
+    }
+    return err.path.includes(field.name);
+  });
+  const isInvalid =
+    !!error?.message && !field.state.meta.isValid && field.state.meta.isTouched;
   return (
     <TextField
       {...props}
@@ -52,7 +52,8 @@ function AppTextField({
       onChange={(e) => field.handleChange(e)}
       onBlur={field.handleBlur}
       id={field.name}
-      isInvalid={!!error?.message}
+      isInvalid={isInvalid}
+      validationBehavior="aria"
     >
       <Label>{label}</Label>
       <Input placeholder={placeholder} />
@@ -82,13 +83,19 @@ function AppSelectField<T extends any[]>({
   const error = field.state.meta.errors.find((err) =>
     err.path.includes(field.name),
   );
+
+  const isInvalid =
+    !!error?.message && !field.state.meta.isValid && field.state.meta.isTouched;
+
   return (
     <Select
       {...props}
       placeholder={placeholder}
       value={field.state.value}
       onChange={(key) => field.handleChange(key)}
-      isInvalid={!!error?.message}
+      isInvalid={isInvalid}
+      onBlur={field.handleBlur}
+      name={field.name}
     >
       <Label>{label}</Label>
       {description && <Description>{description}</Description>}
@@ -112,5 +119,65 @@ function AppSelectField<T extends any[]>({
       </Select.Popover>
       <FieldError>{error?.message}</FieldError>
     </Select>
+  );
+}
+
+function AppComboBoxField<
+  TOption extends Record<string, any>,
+  TMode extends "single" | "multiple" = "single",
+  TItem extends object = object,
+>({
+  label,
+  description,
+  options,
+  getOptionLabel,
+  getOptionValue,
+  ...props
+}: ComboBoxProps<TItem, TMode> & {
+  label: string;
+  description?: string;
+  options: TOption[];
+  getOptionValue: (v: TOption) => string;
+  getOptionLabel: (v: TOption) => string;
+}) {
+  const field = formHookContexts.useFieldContext<string>();
+  const error = field.state.meta.errors.find((err) =>
+    err.path.includes(field.name),
+  );
+
+  const isInvalid =
+    !!error?.message && !field.state.meta.isValid && field.state.meta.isTouched;
+
+  return (
+    <ComboBox
+      {...props}
+      isInvalid={isInvalid}
+      name={field.name}
+      value={field.state.value}
+      onBlur={field.handleBlur}
+      onChange={(v) => field.handleChange(v)}
+    >
+      <Label>{label}</Label>
+      <ComboBox.InputGroup>
+        <Input placeholder="Select one..." />
+        <ComboBox.Trigger />
+      </ComboBox.InputGroup>
+      <ComboBox.Popover>
+        <ListBox>
+          {options.map((v) => {
+            const optValue = getOptionValue(v);
+            const optLabel = getOptionLabel(v);
+            return (
+              <ListBox.Item key={optValue} id={optValue} textValue={optLabel}>
+                {optLabel}
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+            );
+          })}
+        </ListBox>
+      </ComboBox.Popover>
+      {description && <Description>{description}</Description>}
+      <FieldError>{error?.message}</FieldError>
+    </ComboBox>
   );
 }
