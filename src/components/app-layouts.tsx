@@ -31,6 +31,14 @@ export function AppPageLayout({
   );
 }
 
+export function Header({ children }: PropsWithChildren) {
+  return (
+    <header className="flex justify-between p-3 shadow-md sticky top-0 bg-surface z-10">
+      {children}
+    </header>
+  );
+}
+
 export function Sidebar() {
   const [open, setOpen] = useState(false);
   return (
@@ -48,7 +56,7 @@ export function Sidebar() {
           <Drawer.Dialog>
             <Drawer.CloseTrigger />
             <Drawer.Header>
-              <Drawer.Heading>Navigation</Drawer.Heading>
+              <Drawer.Heading>Main</Drawer.Heading>
             </Drawer.Header>
             <Drawer.Body>
               <nav className="flex flex-col gap-1">

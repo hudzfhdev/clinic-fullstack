@@ -1,3 +1,4 @@
+import { LOCALE_DATEPICKER } from "#/libs/date.ts";
 import {
   Description,
   FieldError,
@@ -7,10 +8,24 @@ import {
   Select,
   TextField,
   ComboBox,
+  DatePicker,
+  DateField,
+  Calendar,
+  I18nProvider,
+  Header,
+  Separator,
 } from "@heroui/react";
-import type { SelectProps, TextFieldProps } from "@heroui/react";
+import type {
+  DatePickerProps,
+  DateValue,
+  SelectProps,
+  TextFieldProps,
+} from "@heroui/react";
 import type { ComboBoxProps } from "@heroui/react/combo-box";
+import { CalendarDate } from "@internationalized/date";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
+import { ChevronDownIcon, CalendarIcon } from "lucide-react";
+import { Fragment, useMemo } from "react";
 
 export const formHookContexts = createFormHookContexts();
 
@@ -21,6 +36,7 @@ export const { useAppForm } = createFormHook({
     AppTextField,
     AppSelectField,
     AppComboBoxField,
+    AppDatePickerField,
   },
   formComponents: {},
 });
@@ -43,7 +59,11 @@ function AppTextField({
     return err.path.includes(field.name);
   });
   const isInvalid =
-    !!error?.message && !field.state.meta.isValid && field.state.meta.isTouched;
+    !!error?.message &&
+    !field.state.meta.isValid &&
+    field.state.meta.isTouched &&
+    !field.state.meta.isBlurred;
+
   return (
     <TextField
       {...props}
@@ -85,8 +105,10 @@ function AppSelectField<T extends any[]>({
   );
 
   const isInvalid =
-    !!error?.message && !field.state.meta.isValid && field.state.meta.isTouched;
-
+    !!error?.message &&
+    !field.state.meta.isValid &&
+    field.state.meta.isTouched &&
+    !field.state.meta.isBlurred;
   return (
     <Select
       {...props}
@@ -123,22 +145,22 @@ function AppSelectField<T extends any[]>({
 }
 
 function AppComboBoxField<
-  TOption extends Record<string, any>,
+  TOption extends
+    | { label: string; value: string }
+    | { section: string; items: Array<{ label: string; value: string }> },
   TMode extends "single" | "multiple" = "single",
   TItem extends object = object,
 >({
   label,
   description,
   options,
-  getOptionLabel,
-  getOptionValue,
+  allowEmpty = false,
   ...props
 }: ComboBoxProps<TItem, TMode> & {
   label: string;
   description?: string;
   options: TOption[];
-  getOptionValue: (v: TOption) => string;
-  getOptionLabel: (v: TOption) => string;
+  allowEmpty?: boolean;
 }) {
   const field = formHookContexts.useFieldContext<string>();
   const error = field.state.meta.errors.find((err) =>
@@ -146,7 +168,10 @@ function AppComboBoxField<
   );
 
   const isInvalid =
-    !!error?.message && !field.state.meta.isValid && field.state.meta.isTouched;
+    !!error?.message &&
+    !field.state.meta.isValid &&
+    field.state.meta.isTouched &&
+    !field.state.meta.isBlurred;
 
   return (
     <ComboBox
@@ -155,7 +180,10 @@ function AppComboBoxField<
       name={field.name}
       value={field.state.value}
       onBlur={field.handleBlur}
-      onChange={(v) => field.handleChange(v)}
+      onChange={(v) => {
+        if (v === "none") field.handleChange("");
+        else field.handleChange(v);
+      }}
     >
       <Label>{label}</Label>
       <ComboBox.InputGroup>
@@ -164,20 +192,150 @@ function AppComboBoxField<
       </ComboBox.InputGroup>
       <ComboBox.Popover>
         <ListBox>
-          {options.map((v) => {
-            const optValue = getOptionValue(v);
-            const optLabel = getOptionLabel(v);
-            return (
-              <ListBox.Item key={optValue} id={optValue} textValue={optLabel}>
-                {optLabel}
-                <ListBox.ItemIndicator />
-              </ListBox.Item>
-            );
+          {allowEmpty ? (
+            <ListBox.Item
+              className="italic"
+              key="none"
+              id="none"
+              textValue={""}
+            >
+              None
+            </ListBox.Item>
+          ) : null}
+          {options.map((v, index) => {
+            if ("section" in v) {
+              return (
+                <Fragment key={v.section}>
+                  <ListBox.Section>
+                    <Header>{v.section}</Header>
+                    {v.items.map(({ label: labelOpt, value: valueOpt }) => (
+                      <ListBox.Item
+                        key={valueOpt}
+                        id={valueOpt}
+                        textValue={labelOpt}
+                      >
+                        {labelOpt}
+                        <ListBox.ItemIndicator />
+                      </ListBox.Item>
+                    ))}
+                  </ListBox.Section>
+                  {index !== options.length - 1 ? <Separator /> : null}
+                </Fragment>
+              );
+            }
+            if (!("section" in v)) {
+              const { label: labelOpt, value: valueOpt } = v;
+              return (
+                <ListBox.Item key={valueOpt} id={valueOpt} textValue={labelOpt}>
+                  {labelOpt}
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              );
+            }
           })}
         </ListBox>
       </ComboBox.Popover>
       {description && <Description>{description}</Description>}
       <FieldError>{error?.message}</FieldError>
     </ComboBox>
+  );
+}
+
+function AppDatePickerField({
+  label,
+  description,
+  variant,
+  ...props
+}: {
+  label: string;
+  description?: string;
+  variant?: DateField["GroupProps"]["variant"];
+} & DatePickerProps<DateValue>) {
+  const field = formHookContexts.useFieldContext<any>();
+  const error = field.state.meta.errors.find((err) =>
+    err.path.includes(field.name),
+  );
+
+  const isInvalid =
+    !!error?.message &&
+    !field.state.meta.isValid &&
+    field.state.meta.isTouched &&
+    !field.state.meta.isBlurred;
+
+  const value = useMemo(() => {
+    let _value: CalendarDate | null = null;
+    if (field.state.value && typeof field.state.value === "string") {
+      const [d, m, y] = field.state.value.split("/").map(Number);
+      _value = new CalendarDate(y, m, d);
+    }
+    return _value;
+  }, [field.state.value]);
+
+  const onChange: DatePicker["Props"]["onChange"] = (v) => {
+    if (v) {
+      const [day, month, year] = [v.day, v.month, v.year];
+      field.handleChange(`${day}/${month}/${year}`);
+    } else {
+      field.handleChange("");
+    }
+  };
+
+  return (
+    <I18nProvider locale={LOCALE_DATEPICKER}>
+      <DatePicker
+        {...props}
+        name={field.name}
+        onBlur={field.handleBlur}
+        id={field.name}
+        value={value}
+        onChange={onChange}
+        isInvalid={isInvalid}
+      >
+        <Label>{label}</Label>
+        <DateField.Group variant={variant}>
+          <DateField.Prefix>
+            <CalendarIcon className="size-4 text-muted" />
+          </DateField.Prefix>
+          <DateField.Input>
+            {(segment) => <DateField.Segment segment={segment} />}
+          </DateField.Input>
+          <DateField.Suffix>
+            <DatePicker.Trigger>
+              <ChevronDownIcon className="size-4 text-muted" />
+            </DatePicker.Trigger>
+          </DateField.Suffix>
+        </DateField.Group>
+        {description ? <Description>{description}</Description> : null}
+        <FieldError>{error?.messsage}</FieldError>
+
+        <DatePicker.Popover>
+          <Calendar aria-label="Event date">
+            <Calendar.Header>
+              <Calendar.YearPickerTrigger>
+                <Calendar.YearPickerTriggerHeading />
+                <Calendar.YearPickerTriggerIndicator />
+              </Calendar.YearPickerTrigger>
+              <Calendar.NavButton slot="previous" />
+              <Calendar.NavButton slot="next" />
+            </Calendar.Header>
+
+            <Calendar.Grid>
+              <Calendar.GridHeader>
+                {(day) => <Calendar.HeaderCell>{day}</Calendar.HeaderCell>}
+              </Calendar.GridHeader>
+              <Calendar.GridBody>
+                {(date) => <Calendar.Cell date={date} />}
+              </Calendar.GridBody>
+            </Calendar.Grid>
+
+            <Calendar.YearPickerGrid>
+              <Calendar.YearPickerGridBody>
+                {({ year }) => <Calendar.YearPickerCell year={year} />}
+              </Calendar.YearPickerGridBody>
+            </Calendar.YearPickerGrid>
+          </Calendar>
+        </DatePicker.Popover>
+      </DatePicker>
+    </I18nProvider>
   );
 }

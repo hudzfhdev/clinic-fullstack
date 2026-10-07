@@ -1,18 +1,18 @@
-export const PRACTITIONER_SPECIALTIES = {
+export const PRACTITIONERS_SPECIALTIES = {
   ANAESTHESIOLOGY_CRITICAL_CARE: {
-    name: "ANAESTHESIOLOGY & CRITICAL CARE",
+    category: "ANAESTHESIOLOGY & CRITICAL CARE",
     fields: ["ANAESTHESIOLOGY & CRITICAL CARE", "INTENSIVE CARE"],
   },
   EMERGENCY_MEDICINE: {
-    name: "EMERGENCY MEDICINE",
+    category: "EMERGENCY MEDICINE",
     fields: ["EMERGENCY MEDICINE"],
   },
   FAMILY_MEDICINE: {
-    name: "FAMILY MEDICINE",
+    category: "FAMILY MEDICINE",
     fields: ["FAMILY MEDICINE"],
   },
   INTERNAL_MEDICINE: {
-    name: "INTERNAL MEDICINE",
+    category: "INTERNAL MEDICINE",
     fields: [
       "INTERNAL MEDICINE",
       "CARDIOLOGY",
@@ -32,27 +32,27 @@ export const PRACTITIONER_SPECIALTIES = {
     ],
   },
   NUCLEAR_MEDICINE: {
-    name: "NUCLEAR MEDICINE",
+    category: "NUCLEAR MEDICINE",
     fields: ["NUCLEAR MEDICINE"],
   },
   REHABILITATION_MEDICINE: {
-    name: "REHABILITATION MEDICINE",
+    category: "REHABILITATION MEDICINE",
     fields: ["REHABILITATION MEDICINE"],
   },
   SPORTS_MEDICINE: {
-    name: "SPORTS MEDICINE",
+    category: "SPORTS MEDICINE",
     fields: ["SPORTS MEDICINE"],
   },
   ONCOLOGY: {
-    name: "ONCOLOGY",
+    category: "ONCOLOGY",
     fields: ["CLINICAL ONCOLOGY", "RADIATION ONCOLOGY"],
   },
   CLINICAL_RADIOLOGY: {
-    name: "CLINICAL RADIOLOGY",
+    category: "CLINICAL RADIOLOGY",
     fields: ["CLINICAL RADIOLOGY"],
   },
   GENERAL_PAEDIATRICS: {
-    name: "GENERAL PAEDIATRICS",
+    category: "GENERAL PAEDIATRICS",
     fields: [
       "GENERAL PAEDIATRICS",
       "ADOLESCENT MEDICINE",
@@ -74,39 +74,39 @@ export const PRACTITIONER_SPECIALTIES = {
     ],
   },
   GENERAL_PATHOLOGY: {
-    name: "GENERAL PATHOLOGY",
+    category: "GENERAL PATHOLOGY",
     fields: ["GENERAL PATHOLOGY"],
   },
   ANATOMICAL_PATHOLOGY: {
-    name: "ANATOMICAL PATHOLOGY",
+    category: "ANATOMICAL PATHOLOGY",
     fields: ["ANATOMICAL PATHOLOGY"],
   },
   CHEMICAL_PATHOLOGY: {
-    name: "CHEMICAL PATHOLOGY",
+    category: "CHEMICAL PATHOLOGY",
     fields: ["CHEMICAL PATHOLOGY", "CHEMICAL PATHOLOGY (METABOLIC MEDICINE)"],
   },
   HAEMATOLOGY: {
-    name: "HAEMATOLOGY",
+    category: "HAEMATOLOGY",
     fields: ["HAEMATOLOGY"],
   },
   MEDICAL_MICROBIOLOGY: {
-    name: "MEDICAL MICROBIOLOGY",
+    category: "MEDICAL MICROBIOLOGY",
     fields: ["MEDICAL MICROBIOLOGY"],
   },
   FORENSIC_PATHOLOGY: {
-    name: "FORENSIC PATHOLOGY",
+    category: "FORENSIC PATHOLOGY",
     fields: ["FORENSIC PATHOLOGY"],
   },
   GENETIC_PATHOLOGY: {
-    name: "GENETIC PATHOLOGY",
+    category: "GENETIC PATHOLOGY",
     fields: ["GENETIC PATHOLOGY"],
   },
   TRANSFUSION_MEDICINE: {
-    name: "TRANSFUSION MEDICINE",
+    category: "TRANSFUSION MEDICINE",
     fields: ["TRANSFUSION MEDICINE"],
   },
   PSYCHIATRY: {
-    name: "PSYCHIATRY",
+    category: "PSYCHIATRY",
     fields: [
       "PSYCHIATRY",
       "CHILD AND ADOLESCENT PSYCHIATRY",
@@ -114,7 +114,7 @@ export const PRACTITIONER_SPECIALTIES = {
     ],
   },
   PUBLIC_HEALTH: {
-    name: "PUBLIC HEALTH",
+    category: "PUBLIC HEALTH",
     fields: [
       "PUBLIC HEALTH MEDICINE",
       "COMMUNICABLE DISEASE EPIDEMIOLOGY",
@@ -127,7 +127,7 @@ export const PRACTITIONER_SPECIALTIES = {
     ],
   },
   OBSTETRICS_GYNAECOLOGY: {
-    name: "OBSTETRICS & GYNAECOLOGY",
+    category: "OBSTETRICS & GYNAECOLOGY",
     fields: [
       "OBSTETRICS & GYNAECOLOGY",
       "GYNAE-ONCOLOGY",
@@ -137,7 +137,7 @@ export const PRACTITIONER_SPECIALTIES = {
     ],
   },
   GENERAL_SURGERY: {
-    name: "GENERAL SURGERY",
+    category: "GENERAL SURGERY",
     fields: [
       "GENERAL SURGERY",
       "BREAST / AND ENDOCRINE SURGERY",
@@ -149,31 +149,31 @@ export const PRACTITIONER_SPECIALTIES = {
     ],
   },
   CARDIOTHORACIC_SURGERY: {
-    name: "CARDIOTHORACIC SURGERY",
+    category: "CARDIOTHORACIC SURGERY",
     fields: ["CARDIOTHORACIC SURGERY"],
   },
   NEUROSURGERY: {
-    name: "NEUROSURGERY",
+    category: "NEUROSURGERY",
     fields: ["NEUROSURGERY"],
   },
   PAEDIATRIC_SURGERY: {
-    name: "PAEDIATRIC SURGERY",
+    category: "PAEDIATRIC SURGERY",
     fields: ["PAEDIATRIC SURGERY"],
   },
   PLASTIC_SURGERY: {
-    name: "PLASTIC SURGERY",
+    category: "PLASTIC SURGERY",
     fields: ["PLASTIC SURGERY"],
   },
   OPHTHALMOLOGY: {
-    name: "OPHTHALMOLOGY",
+    category: "OPHTHALMOLOGY",
     fields: ["OPHTHALMOLOGY"],
   },
   OTORHINOLARYNGOLOGY: {
-    name: "OTORHINOLARYNGOLOGY",
+    category: "OTORHINOLARYNGOLOGY",
     fields: ["OTORHINOLARYNGOLOGY"],
   },
   ORTHOPAEDIC_SURGERY: {
-    name: "ORTHOPAEDIC SURGERY",
+    category: "ORTHOPAEDIC SURGERY",
     fields: [
       "ORTHOPAEDIC SURGERY",
       "SPINE SURGERY",
@@ -187,7 +187,7 @@ export const PRACTITIONER_SPECIALTIES = {
     ],
   },
   UROLOGY: {
-    name: "UROLOGY",
+    category: "UROLOGY",
     fields: ["UROLOGY"],
   },
 } as const;

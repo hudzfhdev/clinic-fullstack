@@ -1,4 +1,4 @@
-import { Sidebar } from "#/components/app-layouts.tsx";
+import { Header, Sidebar } from "#/components/app-layouts.tsx";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_private")({
@@ -8,9 +8,9 @@ export const Route = createFileRoute("/_private")({
 function RouteComponent() {
   return (
     <div className="flex flex-col h-full">
-      <header className="flex justify-between p-3 shadow-md sticky top-0 bg-white z-10">
+      <Header>
         <Sidebar />
-      </header>
+      </Header>
       <Outlet />
     </div>
   );

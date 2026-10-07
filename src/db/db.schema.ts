@@ -28,7 +28,7 @@ const address = () =>
 
 export const clinics = pgTable("clinics", {
   id: uuid().primaryKey().defaultRandom(),
-  name: text().notNull(),
+  name: text().unique().notNull(),
   status: text().$type<"active" | "pending">().notNull().default("active"),
   address: address(),
   ...timestamp_tz(),
@@ -36,23 +36,23 @@ export const clinics = pgTable("clinics", {
 
 export const practitioners = pgTable("practitioners", {
   id: uuid().primaryKey().defaultRandom(),
-  name: text().notNull(),
+  name: text().unique().notNull(),
   status: text().$type<"active" | "suspended" | "inactive">().notNull(),
   gender: text().$type<"male" | "female" | "other">().notNull(),
   dob: text().notNull(),
-  identification_no: text().notNull(),
+  identification_no: text().unique().notNull(),
   address: address(),
-  phone_number: text().notNull(),
+  phone_number: text().unique().notNull(),
   clinic_id: uuid().references(() => clinics.id),
   specialty_id: uuid()
-    .references(() => practitioner_specialties.id)
+    .references(() => practitioners_specialties.id)
     .notNull(),
   ...timestamp_tz(),
 });
 
-export const practitioner_specialties = pgTable("practitioner_specialties", {
+export const practitioners_specialties = pgTable("practitioners_specialties", {
   id: uuid().primaryKey().defaultRandom(),
-  name: text().notNull(),
-  fields: jsonb().notNull().$type<Array<string>>(),
+  name: text().unique().notNull(),
+  category: text().notNull(),
   ...timestamp_tz(),
 });

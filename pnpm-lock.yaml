@@ -17,6 +17,9 @@ importers:
       '@heroui/styles':
         specifier: ^3.2.6
         version: 3.2.6(tailwindcss@4.3.3)
+      '@internationalized/date':
+        specifier: ^3.12.4
+        version: 3.12.4
       '@orpc/client':
         specifier: ^1.13.6
         version: 1.15.4

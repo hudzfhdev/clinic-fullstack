@@ -19,7 +19,9 @@ export const createClinic = os
   });
 
 export const listClinics = os.handler(async () => {
-  const listOfClinics = await db.query.clinics.findMany();
+  const listOfClinics = await db.query.clinics.findMany({
+    orderBy: (col, op) => op.desc(col.created_at),
+  });
   return listOfClinics;
 });
 
@@ -28,7 +30,7 @@ export const getClinicByID = os
   .handler(async ({ input }) => {
     const { clinic_id } = input;
     const clinic = await db.query.clinics.findFirst({
-      where: (f, o) => o.eq(f.id, clinic_id),
+      where: (col, op) => op.eq(col.id, clinic_id),
     });
     if (!clinic) {
       throw new ORPCError("NOT_FOUND", { message: "clinic not found." });
