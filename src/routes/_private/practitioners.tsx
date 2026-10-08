@@ -11,6 +11,7 @@ import {
   Typography,
   buttonVariants,
   SearchField,
+  Surface,
 } from "@heroui/react";
 import {
   createColumnHelper,
@@ -62,6 +63,15 @@ const columns = columnHelper.columns([
     header: "Date of Birth",
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor("email", {
+    header: "Email",
+    cell: (info) =>
+      info.getValue() || (
+        <Typography type="body-sm" className="text-muted">
+          Not Available
+        </Typography>
+      ),
+  }),
   columnHelper.accessor("phone_number", {
     header: "Phone Number",
     cell: (info) => info.getValue(),
@@ -96,65 +106,71 @@ function RouteComponent() {
   });
 
   return (
-    <AppPageLayout className="space-y-5">
-      <div className="flex justify-between items-center">
-        <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
-          <StethoscopeIcon aria-hidden />
-          <Typography type="h3">Practitioners</Typography>
-          <Typography className="col-start-2" type="body" color="muted">
-            List of practitioners
-          </Typography>
+    <AppPageLayout>
+      <Surface className="p-5 space-y-5">
+        <div className="flex justify-between items-center">
+          <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
+            <StethoscopeIcon aria-hidden />
+            <Typography type="h3">Practitioners</Typography>
+            <Typography className="col-start-2" type="body" color="muted">
+              List of practitioners
+            </Typography>
+          </div>
+          <Link
+            className={buttonVariants({ fullWidth: false })}
+            to="/practitioners/new"
+          >
+            <PlusCircleIcon />
+            Add Practitioner
+          </Link>
         </div>
-        <Link
-          className={buttonVariants({ fullWidth: false })}
-          to="/practitioners/new"
-        >
-          <PlusCircleIcon />
-          Add Practitioner
-        </Link>
-      </div>
 
-      <div>
-        <SearchField className="md:w-96" aria-label="search practitioners">
-          <SearchField.Group>
-            <SearchField.SearchIcon />
-            <SearchField.Input placeholder="Search..." />
-            <SearchField.ClearButton />
-          </SearchField.Group>
-        </SearchField>
-      </div>
+        <div>
+          <SearchField
+            variant="secondary"
+            className="md:w-96"
+            aria-label="search practitioners"
+          >
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input placeholder="Search..." />
+              <SearchField.ClearButton />
+            </SearchField.Group>
+          </SearchField>
+        </div>
 
-      <Table>
-        <Table.ScrollContainer>
-          <Table.Content aria-label="list of practitioners">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Header key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Column
-                    isRowHeader={header.id === "id"}
-                    key={header.id}
-                  >
-                    {header.isPlaceholder ? null : (
-                      <table.FlexRender header={header} />
-                    )}
-                  </Table.Column>
-                ))}
-              </Table.Header>
-            ))}
-            <Table.Body renderEmptyState={() => <EmptyTable />}>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Row key={row.id}>
-                  {row.getAllCells().map((cell) => (
-                    <Table.Cell key={cell.id}>
-                      <table.FlexRender cell={cell} />
-                    </Table.Cell>
+        <Table>
+          <Table.ScrollContainer>
+            <Table.Content aria-label="list of practitioners">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Table.Header key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <Table.Column
+                      isRowHeader={header.id === "id"}
+                      key={header.id}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <table.FlexRender header={header} />
+                      )}
+                    </Table.Column>
                   ))}
-                </Table.Row>
+                </Table.Header>
               ))}
-            </Table.Body>
-          </Table.Content>
-        </Table.ScrollContainer>
-      </Table>
+              <Table.Body renderEmptyState={() => <EmptyTable />}>
+                {table.getRowModel().rows.map((row) => (
+                  <Table.Row key={row.id}>
+                    {row.getAllCells().map((cell) => (
+                      <Table.Cell key={cell.id}>
+                        <table.FlexRender cell={cell} />
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
+      </Surface>
     </AppPageLayout>
   );
 }

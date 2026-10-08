@@ -44,6 +44,7 @@ export const practitioners = pgTable("practitioners", {
   address: address(),
   phone_number: text().unique().notNull(),
   clinic_id: uuid().references(() => clinics.id),
+  email: text(),
   specialty_id: uuid()
     .references(() => practitioners_specialties.id)
     .notNull(),
@@ -54,5 +55,21 @@ export const practitioners_specialties = pgTable("practitioners_specialties", {
   id: uuid().primaryKey().defaultRandom(),
   name: text().unique().notNull(),
   category: text().notNull(),
+  ...timestamp_tz(),
+});
+
+export const patients = pgTable("patients", {
+  id: uuid().defaultRandom().primaryKey(),
+  name: text().notNull(),
+  gender: text().$type<"male" | "female" | "other">().notNull(),
+  dob: text().notNull(),
+  patient_no: text().unique().notNull(),
+  identification_card: text().unique().notNull(),
+  address: address(),
+  phone_number: text().unique().notNull(),
+  email: text(),
+  clinic_id: uuid()
+    .references(() => clinics.id)
+    .notNull(),
   ...timestamp_tz(),
 });

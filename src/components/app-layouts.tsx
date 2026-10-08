@@ -5,6 +5,7 @@ import {
   LayoutDashboardIcon,
   MenuIcon,
   StethoscopeIcon,
+  UsersRoundIcon,
 } from "lucide-react";
 import { useState } from "react";
 import type { ComponentType, PropsWithChildren, SVGProps } from "react";
@@ -18,6 +19,7 @@ const navItems: {
   { icon: LayoutDashboardIcon, label: "Dashboard", to: "/" },
   { icon: HospitalIcon, label: "Clinics", to: "/clinics" },
   { icon: StethoscopeIcon, label: "Practitioners", to: "/practitioners" },
+  { icon: UsersRoundIcon, label: "Patients", to: "/patients" },
 ];
 
 export function AppPageLayout({
@@ -32,14 +34,28 @@ export function AppPageLayout({
 }
 
 export function AppHeader({ children }: PropsWithChildren) {
+  // const { resolvedTheme, theme } = useTheme();
+
   return (
     <header className="flex justify-between p-3 shadow-md sticky top-0 bg-surface z-10">
+      <div className="flex gap-2 items-center">
+        <AppSidebar />
+        {/* {resolvedTheme === "dark" ? (
+          <img
+            className="h-5"
+            src={BrandLogoDarkMode}
+            alt="brand logo with label"
+          />
+        ) : resolvedTheme === "light" ? (
+          <img className="h-5" src={BrandLogo} alt="brand logo with label" />
+        ) : null} */}
+      </div>
       {children}
     </header>
   );
 }
 
-export function AppSidebar() {
+function AppSidebar() {
   const [open, setOpen] = useState(false);
   return (
     <Drawer isOpen={open} onOpenChange={setOpen}>
@@ -54,7 +70,6 @@ export function AppSidebar() {
       <Drawer.Backdrop variant="blur">
         <Drawer.Content placement="left">
           <Drawer.Dialog>
-            <Drawer.CloseTrigger />
             <Drawer.Header>
               <Drawer.Heading>Main</Drawer.Heading>
             </Drawer.Header>
@@ -63,17 +78,23 @@ export function AppSidebar() {
                 {navItems.map((item) => (
                   <Link
                     key={item.label}
-                    className="text rounded-xl w-full text-sm text-foreground transition-colors hover:bg-default"
                     onPress={() => setOpen(false)}
-                  >
-                    <TRRLink
-                      to={item.to}
-                      className="w-full px-3 py-2.5 flex items-center gap-3"
-                    >
-                      <item.icon className="size-5 text-muted" />
-                      {item.label}
-                    </TRRLink>
-                  </Link>
+                    render={({ className, ...props }) => (
+                      <TRRLink
+                        {...props}
+                        to={item.to}
+                        className={cn(
+                          className,
+                          "flex items-center gap-3 no-underline w-full px-3 py-2.5",
+                          "rounded-xl text-sm text-foreground transition-colors hover:bg-default",
+                          "data-[status='active']:bg-default ",
+                        )}
+                      >
+                        <item.icon className="size-5 text-muted" />
+                        {item.label}
+                      </TRRLink>
+                    )}
+                  />
                 ))}
               </nav>
             </Drawer.Body>

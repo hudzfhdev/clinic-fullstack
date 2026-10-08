@@ -5,7 +5,6 @@ import type { client } from "./client";
 export type OutputRouter = InferClientOutputs<typeof client>;
 
 /* REUSABLE SCHEMA */
-
 const zAddressSchema = () =>
   z.object({
     address_one: z.string().min(1),
@@ -21,7 +20,6 @@ const zTimeStampSchema = () => ({
 });
 
 /* CLINIC SCHEMA */
-
 export const zClinicSchema = z
   .object({
     id: z.uuid(),
@@ -40,7 +38,6 @@ export const zClinicCreateSchema = z.object({
 export type ClinicCreateSchema = z.infer<typeof zClinicCreateSchema>;
 
 /* PRACTITIONER SCHEMA */
-
 export const zPractitionerSchema = z
   .object({
     id: z.uuid(),
@@ -63,8 +60,10 @@ export const zPractitionerSchema = z
     address: z.nullish(zAddressSchema()),
     clinic_id: z.nullish(z.string()),
     specialty_id: z.uuid(),
+    email: z.nullish(z.email()),
   })
   .extend(zTimeStampSchema());
+
 export type Practitioner = z.infer<typeof zPractitionerSchema>;
 
 export const zPractitionerCreateSchema = zPractitionerSchema.omit({
@@ -85,3 +84,33 @@ export const zSpecialtySchema = z
   })
   .extend(zTimeStampSchema());
 export type Specialty = z.infer<typeof zSpecialtySchema>;
+
+/* PATIENT SCHEMA */
+export const zPatientSchema = z
+  .object({
+    id: z.uuid(),
+    patient_no: z.string(),
+    name: z.string().min(3),
+    gender: z.union([
+      z.literal("male"),
+      z.literal("female"),
+      z.literal("other"),
+    ]),
+    dob: z.string(),
+    identification_no: z.string().length(12),
+    phone_number: z
+      .string()
+      .regex(/^01[0-9]{8,9}$/i, { error: "Incorrect phone number format." }),
+    address: z.nullish(zAddressSchema()),
+    clinic_id: z.nullish(z.string()),
+    email: z.nullish(z.email()),
+  })
+  .extend(zTimeStampSchema());
+export type Patient = z.infer<typeof zPatientSchema>;
+
+export const zCreatePatientSchema = zPatientSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+export type PatientCreateSchema = z.infer<typeof zClinicCreateSchema>;

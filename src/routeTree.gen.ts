@@ -19,6 +19,7 @@ import { Route as PrivatePractitionersRouteImport } from './routes/_private/prac
 import { Route as PrivateStaffsRouteImport } from './routes/_private/staffs'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
 import { Route as PrivateClinicsNewRouteImport } from './routes/_private/clinics_.new'
+import { Route as PrivatePatientsNewRouteImport } from './routes/_private/patients_.new'
 import { Route as PrivatePractitionersNewRouteImport } from './routes/_private/practitioners_.new'
 import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
 import { Route as PrivateClinicsIdDetailsRouteImport } from './routes/_private/clinics_.$id.details'
@@ -72,6 +73,11 @@ const PrivateClinicsNewRoute = PrivateClinicsNewRouteImport.update({
   path: '/clinics/new',
   getParentRoute: () => PrivateRoute,
 } as any)
+const PrivatePatientsNewRoute = PrivatePatientsNewRouteImport.update({
+  id: '/patients_/new',
+  path: '/patients/new',
+  getParentRoute: () => PrivateRoute,
+} as any)
 const PrivatePractitionersNewRoute = PrivatePractitionersNewRouteImport.update({
   id: '/practitioners_/new',
   path: '/practitioners/new',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/staffs': typeof PrivateStaffsRoute
   '/api/$': typeof ApiSplatRoute
   '/clinics/new': typeof PrivateClinicsNewRoute
+  '/patients/new': typeof PrivatePatientsNewRoute
   '/practitioners/new': typeof PrivatePractitionersNewRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/clinics/$id/details': typeof PrivateClinicsIdDetailsRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/staffs': typeof PrivateStaffsRoute
   '/api/$': typeof ApiSplatRoute
   '/clinics/new': typeof PrivateClinicsNewRoute
+  '/patients/new': typeof PrivatePatientsNewRoute
   '/practitioners/new': typeof PrivatePractitionersNewRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/clinics/$id/details': typeof PrivateClinicsIdDetailsRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/_private/staffs': typeof PrivateStaffsRoute
   '/api/$': typeof ApiSplatRoute
   '/_private/clinics_/new': typeof PrivateClinicsNewRoute
+  '/_private/patients_/new': typeof PrivatePatientsNewRoute
   '/_private/practitioners_/new': typeof PrivatePractitionersNewRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/_private/clinics_/$id/details': typeof PrivateClinicsIdDetailsRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/staffs'
     | '/api/$'
     | '/clinics/new'
+    | '/patients/new'
     | '/practitioners/new'
     | '/api/rpc/$'
     | '/clinics/$id/details'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/staffs'
     | '/api/$'
     | '/clinics/new'
+    | '/patients/new'
     | '/practitioners/new'
     | '/api/rpc/$'
     | '/clinics/$id/details'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/_private/staffs'
     | '/api/$'
     | '/_private/clinics_/new'
+    | '/_private/patients_/new'
     | '/_private/practitioners_/new'
     | '/api/rpc/$'
     | '/_private/clinics_/$id/details'
@@ -257,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateClinicsNewRouteImport
       parentRoute: typeof PrivateRoute
     }
+    '/_private/patients_/new': {
+      id: '/_private/patients_/new'
+      path: '/patients/new'
+      fullPath: '/patients/new'
+      preLoaderRoute: typeof PrivatePatientsNewRouteImport
+      parentRoute: typeof PrivateRoute
+    }
     '/_private/practitioners_/new': {
       id: '/_private/practitioners_/new'
       path: '/practitioners/new'
@@ -289,6 +308,7 @@ interface PrivateRouteChildren {
   PrivatePractitionersRoute: typeof PrivatePractitionersRoute
   PrivateStaffsRoute: typeof PrivateStaffsRoute
   PrivateClinicsNewRoute: typeof PrivateClinicsNewRoute
+  PrivatePatientsNewRoute: typeof PrivatePatientsNewRoute
   PrivatePractitionersNewRoute: typeof PrivatePractitionersNewRoute
   PrivateClinicsIdDetailsRoute: typeof PrivateClinicsIdDetailsRoute
 }
@@ -301,6 +321,7 @@ const PrivateRouteChildren: PrivateRouteChildren = {
   PrivatePractitionersRoute: PrivatePractitionersRoute,
   PrivateStaffsRoute: PrivateStaffsRoute,
   PrivateClinicsNewRoute: PrivateClinicsNewRoute,
+  PrivatePatientsNewRoute: PrivatePatientsNewRoute,
   PrivatePractitionersNewRoute: PrivatePractitionersNewRoute,
   PrivateClinicsIdDetailsRoute: PrivateClinicsIdDetailsRoute,
 }

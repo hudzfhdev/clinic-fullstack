@@ -1,13 +1,20 @@
 import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
-import { Table, Spinner, Typography, buttonVariants } from "@heroui/react";
+import {
+  Table,
+  Spinner,
+  Typography,
+  buttonVariants,
+  Surface,
+  SearchField,
+} from "@heroui/react";
 import {
   createColumnHelper,
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { PlusCircleIcon } from "lucide-react";
+import { HospitalIcon, PlusCircleIcon } from "lucide-react";
 import { ClinicStatusChips } from "#/components/clinics/status-chips.tsx";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
 import { EmptyTable } from "#/components/empty-table";
@@ -70,47 +77,69 @@ function RouteComponent() {
   });
 
   return (
-    <AppPageLayout className="space-y-3">
-      <div className="flex justify-end">
-        <Link
-          className={buttonVariants({ fullWidth: false })}
-          to="/clinics/new"
+    <AppPageLayout>
+      <Surface className="space-y-5 p-5">
+        <div className="flex justify-between items-center">
+          <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
+            <HospitalIcon aria-hidden />
+            <Typography type="h3">Clinis</Typography>
+            <Typography className="col-start-2" type="body" color="muted">
+              List of clinics
+            </Typography>
+          </div>
+          <Link
+            className={buttonVariants({ fullWidth: false })}
+            to="/clinics/new"
+          >
+            <PlusCircleIcon />
+            Add Clinic
+          </Link>
+        </div>
+
+        <SearchField
+          className="md:w-96"
+          variant="secondary"
+          aria-label="search clinics"
         >
-          <PlusCircleIcon />
-          Add Clinic
-        </Link>
-      </div>
-      <Table>
-        <Table.ScrollContainer>
-          <Table.Content aria-label="list of clinics">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Header key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Column
-                    isRowHeader={header.id === "id"}
-                    key={header.id}
-                  >
-                    {header.isPlaceholder ? null : (
-                      <table.FlexRender header={header} />
-                    )}
-                  </Table.Column>
-                ))}
-              </Table.Header>
-            ))}
-            <Table.Body renderEmptyState={() => <EmptyTable />}>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Row key={row.id}>
-                  {row.getAllCells().map((cell) => (
-                    <Table.Cell key={cell.id}>
-                      <table.FlexRender cell={cell} />
-                    </Table.Cell>
+          <SearchField.Group>
+            <SearchField.SearchIcon />
+            <SearchField.Input placeholder="Search..." />
+            <SearchField.ClearButton />
+          </SearchField.Group>
+        </SearchField>
+
+        <Table>
+          <Table.ScrollContainer>
+            <Table.Content aria-label="list of clinics">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Table.Header key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <Table.Column
+                      isRowHeader={header.id === "id"}
+                      key={header.id}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <table.FlexRender header={header} />
+                      )}
+                    </Table.Column>
                   ))}
-                </Table.Row>
+                </Table.Header>
               ))}
-            </Table.Body>
-          </Table.Content>
-        </Table.ScrollContainer>
-      </Table>
+              <Table.Body renderEmptyState={() => <EmptyTable />}>
+                {table.getRowModel().rows.map((row) => (
+                  <Table.Row key={row.id}>
+                    {row.getAllCells().map((cell) => (
+                      <Table.Cell key={cell.id}>
+                        <table.FlexRender cell={cell} />
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
+      </Surface>
     </AppPageLayout>
   );
 }

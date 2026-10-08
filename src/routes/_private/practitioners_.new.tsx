@@ -23,9 +23,7 @@ import { RouteErrorComponent } from "#/components/routeErrorComponent.tsx";
 import { states } from "#/libs/address.ts";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
-import type { ClientErrors } from "#/types/api";
 import { isDefinedError } from "@orpc/client";
-import { useSelector } from "@tanstack/react-form";
 
 export const Route = createFileRoute("/_private/practitioners_/new")({
   component: RouteComponent,
@@ -68,8 +66,6 @@ function RouteComponent() {
       onSubmitAsync: zPractitionerCreateSchema,
     },
   });
-
-  form.fieldInfo.name?.instance?.validate("submit");
 
   const practitionerMutation = useMutation(
     orpc.createPractitioner.mutationOptions({
