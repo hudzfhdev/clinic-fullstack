@@ -23,6 +23,9 @@ import { RouteErrorComponent } from "#/components/routeErrorComponent.tsx";
 import { states } from "#/libs/address.ts";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
+import type { ClientErrors } from "#/types/api";
+import { isDefinedError } from "@orpc/client";
+import { useSelector } from "@tanstack/react-form";
 
 export const Route = createFileRoute("/_private/practitioners_/new")({
   component: RouteComponent,
@@ -53,11 +56,29 @@ const defaultValues: PractitionerCreateSchema = {
 function RouteComponent() {
   const nav = useNavigate();
   const qc = useQueryClient();
+
+  const form = useAppForm({
+    defaultValues,
+    onSubmit({ value }) {
+      console.log("submitted", value, sanitizeForm(value));
+      practitionerMutation.mutate(sanitizeForm(value));
+    },
+    validators: {
+      onChangeAsync: zPractitionerCreateSchema,
+      onSubmitAsync: zPractitionerCreateSchema,
+    },
+  });
+
+  form.fieldInfo.name?.instance?.validate("submit");
+
   const practitionerMutation = useMutation(
     orpc.createPractitioner.mutationOptions({
       onSettled: (data, err) => {
-        if (err) {
-          toast.danger(`Error`, { description: "Something wrong." });
+        const narrowedError = isDefinedError(err);
+        if (narrowedError) {
+          toast.danger(`Error`, {
+            description: err.message || "Something wrong...",
+          });
           return;
         }
         if (data) {
@@ -71,18 +92,6 @@ function RouteComponent() {
       },
     }),
   );
-
-  const form = useAppForm({
-    defaultValues,
-    onSubmit({ value }) {
-      console.log("submitted", value, sanitizeForm(value));
-      // clinicsMutation.mutate(sanitizeForm(value));
-    },
-    validators: {
-      onChangeAsync: zPractitionerCreateSchema,
-      onSubmitAsync: zPractitionerCreateSchema,
-    },
-  });
 
   return (
     <AppPageLayout className="grid place-items-center">
@@ -113,8 +122,6 @@ function RouteComponent() {
                       { label: "Inactive", value: "inactive" },
                     ] as Array<{ label: string; value: Practitioner["status"] }>
                   }
-                  getLabel={(v) => v.label}
-                  getValue={(v) => v.value}
                   variant="secondary"
                 />
               )}
@@ -160,8 +167,6 @@ function RouteComponent() {
                         value: Practitioner["gender"];
                       }>
                     }
-                    getLabel={(v) => v.label}
-                    getValue={(v) => v.value}
                     variant="secondary"
                   />
                 )}
@@ -295,7 +300,7 @@ function RouteComponent() {
 
             <div className="flex justify-end gap-2">
               <Link
-                to="/clinics"
+                to="/practitioners"
                 className={buttonVariants({ variant: "ghost" })}
               >
                 Back
@@ -325,10 +330,7 @@ function PopulateClinicsOptions({
   return children({ clinics: data });
 }
 
-type Option = {
-  section: string;
-  items: { label: string; value: string }[];
-};
+type Option = { label: string; value: string }[];
 function PopulateSpecialtiesOptions({
   children,
 }: {
@@ -340,16 +342,9 @@ function PopulateSpecialtiesOptions({
 
   const options = useMemo(() => {
     if (!data) return [];
-    return data.reduce<Array<Option>>((acc, item) => {
-      const obj = {} as Option;
-      obj.section = item.category;
-      obj.items = [];
-      item.fields.forEach((field) => {
-        obj.items.push({ label: field.name, value: field.id });
-      });
-      acc.push(obj);
-      return acc;
-    }, []);
+    return data.flatMap<Option>((o) => {
+      return o.fields.map((field) => ({ label: field.name, value: field.id }));
+    });
   }, [data]);
 
   if (isError || isLoading || !data) {

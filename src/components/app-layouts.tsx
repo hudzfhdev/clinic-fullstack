@@ -31,7 +31,7 @@ export function AppPageLayout({
   );
 }
 
-export function Header({ children }: PropsWithChildren) {
+export function AppHeader({ children }: PropsWithChildren) {
   return (
     <header className="flex justify-between p-3 shadow-md sticky top-0 bg-surface z-10">
       {children}
@@ -39,7 +39,7 @@ export function Header({ children }: PropsWithChildren) {
   );
 }
 
-export function Sidebar() {
+export function AppSidebar() {
   const [open, setOpen] = useState(false);
   return (
     <Drawer isOpen={open} onOpenChange={setOpen}>

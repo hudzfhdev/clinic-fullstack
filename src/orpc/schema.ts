@@ -61,7 +61,7 @@ export const zPractitionerSchema = z
       .string()
       .regex(/^01[0-9]{8,9}$/i, { error: "Incorrect phone number format." }),
     address: z.nullish(zAddressSchema()),
-    clinic_id: z.nullish(z.uuid()),
+    clinic_id: z.nullish(z.string()),
     specialty_id: z.uuid(),
   })
   .extend(zTimeStampSchema());

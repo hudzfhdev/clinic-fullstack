@@ -67,7 +67,7 @@ function RouteComponent() {
       },
     } as ClinicCreateSchema,
     onSubmit({ value }) {
-      console.log("submitted", value, sanitizeForm(value));
+      console.log("submitted clinic", value, sanitizeForm(value));
       clinicsMutation.mutate(sanitizeForm(value));
     },
     validators: {
@@ -113,8 +113,6 @@ function RouteComponent() {
                       { label: "Active", value: "active" },
                       { label: "Pending", value: "pending" },
                     ]}
-                    getLabel={(v) => v.label}
-                    getValue={(v) => v.value}
                     variant="secondary"
                   />
                 )}
@@ -172,8 +170,6 @@ function RouteComponent() {
                   children={(field) => (
                     <field.AppComboBoxField
                       options={statesOptions}
-                      getOptionLabel={(v) => v.label}
-                      getOptionValue={(v) => v.value}
                       label="State"
                       isRequired
                       variant="secondary"

@@ -83,21 +83,17 @@ function AppTextField({
   );
 }
 
-function AppSelectField<T extends any[]>({
+function AppSelectField<T extends { label: string; value: string }>({
   label,
   description,
   placeholder = "Select One",
   options,
-  getLabel,
-  getValue,
   ...props
 }: SelectProps<T, "single"> & {
   label: string;
   description?: string;
   placeholder?: string;
-  options: T;
-  getLabel: (value: T[number]) => any;
-  getValue: (value: T[number]) => any;
+  options: T[];
 }) {
   const field = formHookContexts.useFieldContext<string>();
   const error = field.state.meta.errors.find((err) =>
@@ -127,9 +123,7 @@ function AppSelectField<T extends any[]>({
       </Select.Trigger>
       <Select.Popover>
         <ListBox>
-          {options.map((opt) => {
-            const value = getValue(opt);
-            const _label = getLabel(opt);
+          {options.map(({ label: _label, value }) => {
             return (
               <ListBox.Item key={value} id={value} textValue={_label}>
                 {_label}
@@ -181,8 +175,9 @@ function AppComboBoxField<
       value={field.state.value}
       onBlur={field.handleBlur}
       onChange={(v) => {
-        if (v === "none") field.handleChange("");
-        else field.handleChange(v);
+        console.log({ v });
+        if (v) field.handleChange(v);
+        else field.handleChange("");
       }}
     >
       <Label>{label}</Label>
@@ -192,37 +187,27 @@ function AppComboBoxField<
       </ComboBox.InputGroup>
       <ComboBox.Popover>
         <ListBox>
-          {allowEmpty ? (
-            <ListBox.Item
-              className="italic"
-              key="none"
-              id="none"
-              textValue={""}
-            >
-              None
-            </ListBox.Item>
-          ) : null}
-          {options.map((v, index) => {
-            if ("section" in v) {
-              return (
-                <Fragment key={v.section}>
-                  <ListBox.Section>
-                    <Header>{v.section}</Header>
-                    {v.items.map(({ label: labelOpt, value: valueOpt }) => (
-                      <ListBox.Item
-                        key={valueOpt}
-                        id={valueOpt}
-                        textValue={labelOpt}
-                      >
-                        {labelOpt}
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                    ))}
-                  </ListBox.Section>
-                  {index !== options.length - 1 ? <Separator /> : null}
-                </Fragment>
-              );
-            }
+          {options.map((v) => {
+            // FIXME: FIND WORKAROUND TO FIX THIS BUG WHEN SECTION ARE RENDERED, SEARCH WOULD BREAKS
+            // https://github.com/heroui-inc/heroui/issues/6231
+            // if ("section" in v) {
+            //   return (
+            //     <Fragment key={v.section}>
+            //       <ListBox.Item isDisabled>{v.section}</ListBox.Item>
+            //       <Separator />
+            //       {v.items.map(({ label: labelOpt, value: valueOpt }) => (
+            //         <ListBox.Item
+            //           key={valueOpt}
+            //           id={valueOpt}
+            //           textValue={labelOpt}
+            //         >
+            //           {labelOpt}
+            //           <ListBox.ItemIndicator />
+            //         </ListBox.Item>
+            //       ))}
+            //     </Fragment>
+            //   );
+            // }
             if (!("section" in v)) {
               const { label: labelOpt, value: valueOpt } = v;
               return (
