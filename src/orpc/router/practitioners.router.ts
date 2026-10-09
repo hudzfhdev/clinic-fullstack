@@ -1,14 +1,14 @@
 import { db } from "#/db/index.ts";
 import { ORPCError, os } from "@orpc/server";
 import { z } from "zod";
-import { zPractitionerCreateSchema } from "../schema";
 import { practitioners } from "#/db/db.schema.ts";
-import { dv } from "@faker-js/faker";
-import { eq, or, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+import { zPractitionerCreateSchema } from "#/isomorphic/schema/practitioners.schema.ts";
 
 export const listPractitioners = os.handler(async () => {
   return await db.query.practitioners.findMany({
     orderBy: (col, op) => op.desc(col.created_at),
+    with: { clinics: true, practitioners_specialties: true },
   });
 });
 
@@ -16,7 +16,7 @@ export const getPractitionerByID = os
   .input(z.object({ id: z.uuid() }))
   .handler(async ({ input }) => {
     const found = await db.query.practitioners.findFirst({
-      where: (col, op) => op.eq(col.id, input.id),
+      where: { id: input.id },
       orderBy: (col, op) => op.desc(col.created_at),
     });
     if (!found) {
@@ -33,7 +33,7 @@ export const createPractitioner = os
     },
   })
   .handler(async ({ input, errors }) => {
-    const exist = await isEntityExist({
+    const exist = await doesPractitionerExist({
       identification_no: input.identification_no,
       name: input.name,
       phone_number: input.phone_number,
@@ -63,7 +63,7 @@ export const createPractitioner = os
     return newPractitioner;
   });
 
-async function isEntityExist({
+async function doesPractitionerExist({
   name,
   identification_no,
   phone_number,
@@ -73,8 +73,7 @@ async function isEntityExist({
   phone_number: string;
 }) {
   const foundName = await db.query.practitioners.findFirst({
-    where: (col, op) =>
-      op.eq(sql`lower(${col.name})`, name.toLocaleLowerCase()),
+    where: { RAW: (table) => sql`lower(${table.name}) = ${name}` },
   });
   if (foundName) {
     return {
@@ -84,7 +83,10 @@ async function isEntityExist({
   }
 
   const foundIC = await db.query.practitioners.findFirst({
-    where: (col, op) => op.eq(col.identification_no, identification_no),
+    where: {
+      RAW: (table) =>
+        sql`lower(${table.identification_no}) = ${identification_no}`,
+    },
   });
   if (foundIC) {
     return {
@@ -94,7 +96,9 @@ async function isEntityExist({
   }
 
   const foundPhone = await db.query.practitioners.findFirst({
-    where: (col, op) => op.eq(col.phone_number, phone_number),
+    where: {
+      RAW: (table) => sql`lower(${table.phone_number}) = ${phone_number}`,
+    },
   });
   if (foundPhone) {
     return {

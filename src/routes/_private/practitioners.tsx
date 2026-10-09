@@ -18,10 +18,11 @@ import {
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { PlusCircleIcon, StethoscopeIcon } from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
 import { EmptyTable } from "#/components/empty-table";
-import type { Practitioner } from "#/orpc/schema";
+import { EntityIcon } from "#/components/entityIcons.tsx";
+import type { Practitioner } from "#/isomorphic/schema/practitioners.schema.ts";
 
 export const Route = createFileRoute("/_private/practitioners")({
   component: RouteComponent,
@@ -76,6 +77,19 @@ const columns = columnHelper.columns([
     header: "Phone Number",
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor("practitioners_specialties.name", {
+    header: "Field Specialty",
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor("clinics.name", {
+    header: "Clinic Name",
+    cell: (info) =>
+      info.row.original.clinics?.name || (
+        <Typography type="body-sm" className="text-muted">
+          Not Available
+        </Typography>
+      ),
+  }),
   columnHelper.display({
     id: "address",
     header: "Address",
@@ -110,7 +124,7 @@ function RouteComponent() {
       <Surface className="p-5 space-y-5">
         <div className="flex justify-between items-center">
           <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
-            <StethoscopeIcon aria-hidden />
+            <EntityIcon entity="practitioners" aria-hidden />
             <Typography type="h3">Practitioners</Typography>
             <Typography className="col-start-2" type="body" color="muted">
               List of practitioners

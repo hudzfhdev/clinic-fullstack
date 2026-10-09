@@ -12,18 +12,18 @@ import { HouseIcon, StethoscopeIcon, TagPlusIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
-import { zPractitionerCreateSchema } from "#/orpc/schema.ts";
-import type {
-  Clinic,
-  Practitioner,
-  PractitionerCreateSchema,
-} from "#/orpc/schema.ts";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
 import { RouteErrorComponent } from "#/components/routeErrorComponent.tsx";
 import { states } from "#/libs/address.ts";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 import { isDefinedError } from "@orpc/client";
+import { zPractitionerCreateSchema } from "#/isomorphic/schema/practitioners.schema.ts";
+import type {
+  Practitioner,
+  PractitionerCreateSchema,
+} from "#/isomorphic/schema/practitioners.schema.ts";
+import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
 
 export const Route = createFileRoute("/_private/practitioners_/new")({
   component: RouteComponent,

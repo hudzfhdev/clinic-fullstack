@@ -14,11 +14,12 @@ import {
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { HospitalIcon, PlusCircleIcon } from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { ClinicStatusChips } from "#/components/clinics/status-chips.tsx";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
 import { EmptyTable } from "#/components/empty-table";
-import type { Clinic } from "#/orpc/schema";
+import { EntityIcon } from "#/components/entityIcons.tsx";
+import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
 
 export const Route = createFileRoute("/_private/clinics")({
   component: RouteComponent,
@@ -81,7 +82,7 @@ function RouteComponent() {
       <Surface className="space-y-5 p-5">
         <div className="flex justify-between items-center">
           <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
-            <HospitalIcon aria-hidden />
+            <EntityIcon entity="clinics" aria-hidden />
             <Typography type="h3">Clinis</Typography>
             <Typography className="col-start-2" type="body" color="muted">
               List of clinics

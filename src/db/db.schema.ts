@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { defineRelations, sql } from "drizzle-orm";
 import { pgTable, uuid, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 
 const timestamp_tz = () => ({
@@ -70,6 +70,30 @@ export const patients = pgTable("patients", {
   email: text(),
   clinic_id: uuid()
     .references(() => clinics.id)
-    .notNull(),
+    .notNull()
+    .unique(),
   ...timestamp_tz(),
 });
+
+export const relations = defineRelations(
+  {
+    patients,
+    practitioners,
+    practitioners_specialties,
+    clinics,
+  },
+  (r) => ({
+    practitioners: {
+      clinics: r.one.clinics({
+        from: r.practitioners.clinic_id,
+        to: r.clinics.id,
+        optional: true,
+      }),
+      practitioners_specialties: r.one.practitioners_specialties({
+        from: r.practitioners.specialty_id,
+        to: r.practitioners_specialties.id,
+        optional: true,
+      }),
+    },
+  }),
+);

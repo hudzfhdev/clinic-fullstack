@@ -18,22 +18,23 @@ import {
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { PlusCircleIcon, StethoscopeIcon, UsersRoundIcon } from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
 import { EmptyTable } from "#/components/empty-table";
-import type { Practitioner } from "#/orpc/schema";
+import { EntityIcon } from "#/components/entityIcons.tsx";
+import type { Patient } from "#/isomorphic/schema/patients.schema.ts";
 
 export const Route = createFileRoute("/_private/patients")({
   component: RouteComponent,
   errorComponent: ErrorComponent,
   pendingComponent: () => <Spinner />,
   loader: ({ context }) =>
-    context.queryClient.query(orpc.listPractitioners.queryOptions()),
+    context.queryClient.query(orpc.listPatients.queryOptions()),
 });
 
 const features = tableFeatures({});
 
-const columnHelper = createColumnHelper<typeof features, Practitioner>();
+const columnHelper = createColumnHelper<typeof features, Patient>();
 const columns = columnHelper.columns([
   columnHelper.accessor("id", {
     header: "Unique ID",
@@ -47,13 +48,11 @@ const columns = columnHelper.columns([
     header: "Full Name",
     cell: (rowInfo) => rowInfo.getValue(),
   }),
-  columnHelper.accessor("identification_no", {
-    header: "Identity Card",
-    cell: (rowInfo) => rowInfo.getValue(),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: (info) => info.getValue(),
+  columnHelper.accessor("patient_no", {
+    header: "Patient No",
+    cell: (rowInfo) => (
+      <Typography type="code">{rowInfo.getValue()}</Typography>
+    ),
   }),
   columnHelper.accessor("gender", {
     header: "Gender",
@@ -94,14 +93,14 @@ const columns = columnHelper.columns([
 ]);
 
 function RouteComponent() {
-  const practitionersList = useLoaderData({
+  const patientList = useLoaderData({
     from: "/_private/patients",
     strict: true,
   });
   const table = useTable({
     features,
     columns,
-    data: practitionersList,
+    data: patientList,
     getRowId: (row) => row.id,
   });
 
@@ -110,7 +109,7 @@ function RouteComponent() {
       <Surface className="p-5 space-y-5">
         <div className="flex justify-between items-center">
           <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
-            <UsersRoundIcon aria-hidden />
+            <EntityIcon entity="patients" aria-hidden />
             <Typography type="h3">Patients</Typography>
             <Typography className="col-start-2" type="body" color="muted">
               List of patients

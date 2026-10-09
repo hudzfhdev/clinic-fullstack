@@ -1,7 +1,7 @@
 import { db } from "#/db";
 import { clinics } from "#/db/db.schema";
+import { zClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 import { ORPCError, os } from "@orpc/server";
-import { zClinicCreateSchema } from "../schema";
 import z from "zod";
 
 export const createClinic = os
@@ -30,7 +30,7 @@ export const getClinicByID = os
   .handler(async ({ input }) => {
     const { clinic_id } = input;
     const clinic = await db.query.clinics.findFirst({
-      where: (col, op) => op.eq(col.id, clinic_id),
+      where: { id: clinic_id },
     });
     if (!clinic) {
       throw new ORPCError("NOT_FOUND", { message: "clinic not found." });

@@ -18,9 +18,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
 import { states } from "#/libs/address";
-import { zClinicCreateSchema } from "#/orpc/schema.ts";
-import type { ClinicCreateSchema } from "#/orpc/schema.ts";
 import { AppPageLayout } from "#/components/app-layouts.tsx";
+import { zClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
+import type { ClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 
 export const Route = createFileRoute("/_private/clinics_/new")({
   component: RouteComponent,

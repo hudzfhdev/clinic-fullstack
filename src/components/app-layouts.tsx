@@ -1,15 +1,10 @@
 import { Link as TRRLink } from "@tanstack/react-router";
 import { Drawer, Button, Link } from "@heroui/react";
-import {
-  HospitalIcon,
-  LayoutDashboardIcon,
-  MenuIcon,
-  StethoscopeIcon,
-  UsersRoundIcon,
-} from "lucide-react";
+import { LayoutDashboardIcon, MenuIcon } from "lucide-react";
 import { useState } from "react";
 import type { ComponentType, PropsWithChildren, SVGProps } from "react";
 import { cn } from "cn";
+import { mapEntityIcon } from "./entityIcons";
 
 const navItems: {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
@@ -17,9 +12,13 @@ const navItems: {
   to: string;
 }[] = [
   { icon: LayoutDashboardIcon, label: "Dashboard", to: "/" },
-  { icon: HospitalIcon, label: "Clinics", to: "/clinics" },
-  { icon: StethoscopeIcon, label: "Practitioners", to: "/practitioners" },
-  { icon: UsersRoundIcon, label: "Patients", to: "/patients" },
+  { icon: mapEntityIcon["clinics"], label: "Clinics", to: "/clinics" },
+  {
+    icon: mapEntityIcon["practitioners"],
+    label: "Practitioners",
+    to: "/practitioners",
+  },
+  { icon: mapEntityIcon["patients"], label: "Patients", to: "/patients" },
 ];
 
 export function AppPageLayout({
