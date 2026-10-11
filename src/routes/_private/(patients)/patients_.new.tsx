@@ -8,7 +8,7 @@ import {
   toast,
   Typography,
 } from "@heroui/react";
-import { HouseIcon, StethoscopeIcon, TagPlusIcon } from "lucide-react";
+import { HouseIcon, TagPlusIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
@@ -17,15 +17,15 @@ import { RouteErrorComponent } from "#/components/routeErrorComponent.tsx";
 import { states } from "#/libs/address.ts";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
-import { isDefinedError } from "@orpc/client";
-import { zPractitionerCreateSchema } from "#/isomorphic/schema/practitioners.schema.ts";
-import type {
-  Practitioner,
-  PractitionerCreateSchema,
-} from "#/isomorphic/schema/practitioners.schema.ts";
 import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
+import { zCreatePatientSchema } from "#/isomorphic/schema/patients.schema.ts";
+import type {
+  CreatePatientSchema,
+  Patient,
+} from "#/isomorphic/schema/patients.schema.ts";
+import { EntityIcon } from "#/components/entityIcons.tsx";
 
-export const Route = createFileRoute("/_private/practitioners_/new")({
+export const Route = createFileRoute("/_private/(patients)/patients_/new")({
   component: RouteComponent,
   errorComponent: RouteErrorComponent,
   ssr: "data-only",
@@ -33,23 +33,15 @@ export const Route = createFileRoute("/_private/practitioners_/new")({
 
 const statesOptions = states.map((v) => ({ label: v.state, value: v.state }));
 
-const defaultValues: PractitionerCreateSchema = {
+const defaultValues: CreatePatientSchema = {
   name: "",
-  status: "active",
   dob: "",
-  title: "MR",
   gender: "male",
-  identification_no: "",
+  title: "MR",
+  identification_card: "",
+  email: "",
   phone_number: "",
-  specialty_id: "",
   clinic_id: "",
-  address: {
-    address_one: "",
-    address_two: "",
-    city: "",
-    postcode: "",
-    state: "",
-  },
 };
 
 function RouteComponent() {
@@ -60,19 +52,18 @@ function RouteComponent() {
     defaultValues,
     onSubmit({ value }) {
       console.log("submitted", value, sanitizeForm(value));
-      practitionerMutation.mutate(sanitizeForm(value));
+      patientMutation.mutate(sanitizeForm(value));
     },
     validators: {
-      onChangeAsync: zPractitionerCreateSchema,
-      onSubmitAsync: zPractitionerCreateSchema,
+      onChangeAsync: zCreatePatientSchema,
+      onSubmitAsync: zCreatePatientSchema,
     },
   });
 
-  const practitionerMutation = useMutation(
-    orpc.createPractitioner.mutationOptions({
+  const patientMutation = useMutation(
+    orpc.createPatient.mutationOptions({
       onSettled: (data, err) => {
-        const narrowedError = isDefinedError(err);
-        if (narrowedError) {
+        if (err) {
           toast.danger(`Error`, {
             description: err.message || "Something wrong...",
           });
@@ -80,10 +71,10 @@ function RouteComponent() {
         }
         if (data) {
           toast.success(`Success`, {
-            description: "New practitioner has been added.",
+            description: "New patient has been added.",
           });
-          qc.invalidateQueries({ queryKey: orpc.listPractitioners.queryKey() });
-          nav({ to: "/practitioners" });
+          qc.invalidateQueries({ queryKey: orpc.listPatients.queryKey() });
+          nav({ to: "/patients" });
           return;
         }
       },
@@ -102,27 +93,9 @@ function RouteComponent() {
             }}
           >
             <div className="mb-3 flex gap-2 items-center">
-              <StethoscopeIcon />
-              <Typography type="h3">New Practitioner</Typography>
+              <EntityIcon entity="patients" />
+              <Typography type="h3">New Patient</Typography>
             </div>
-
-            <form.AppField
-              name="status"
-              children={(field) => (
-                <field.AppSelectField
-                  label="Status"
-                  isRequired
-                  options={
-                    [
-                      { label: "Active", value: "active" },
-                      { label: "Suspended", value: "suspended" },
-                      { label: "Inactive", value: "inactive" },
-                    ] as Array<{ label: string; value: Practitioner["status"] }>
-                  }
-                  variant="secondary"
-                />
-              )}
-            />
 
             <div className="flex gap-4">
               <form.AppField
@@ -155,7 +128,7 @@ function RouteComponent() {
             </div>
 
             <form.AppField
-              name="identification_no"
+              name="identification_card"
               children={(field) => (
                 <field.AppTextField
                   isRequired
@@ -179,7 +152,7 @@ function RouteComponent() {
                         { label: "Other", value: "other" },
                       ] as Array<{
                         label: string;
-                        value: Practitioner["gender"];
+                        value: Patient["gender"];
                       }>
                     }
                     variant="secondary"
@@ -209,6 +182,7 @@ function RouteComponent() {
                   />
                 )}
               />
+
               <form.AppField
                 name="email"
                 children={(field) => (
@@ -232,7 +206,7 @@ function RouteComponent() {
                         <field.AppComboBoxField
                           allowEmpty
                           variant="secondary"
-                          label="Employed By"
+                          label="Clinic"
                           options={clinics.map((v) => ({
                             label: v.name,
                             value: v.id,
@@ -240,21 +214,6 @@ function RouteComponent() {
                         />
                       )}
                     </PopulateClinicsOptions>
-                  )}
-                />
-                <form.AppField
-                  name="specialty_id"
-                  children={(field) => (
-                    <PopulateSpecialtiesOptions>
-                      {({ options }) => (
-                        <field.AppAutoCompleteField
-                          isRequired
-                          variant="secondary"
-                          label="Specialty"
-                          options={options}
-                        />
-                      )}
-                    </PopulateSpecialtiesOptions>
                   )}
                 />
               </div>
@@ -272,7 +231,6 @@ function RouteComponent() {
                     <field.AppTextField
                       label="Address one"
                       variant="secondary"
-                      isRequired
                     />
                   )}
                 />
@@ -290,21 +248,13 @@ function RouteComponent() {
                 <form.AppField
                   name="address.city"
                   children={(field) => (
-                    <field.AppTextField
-                      label="City"
-                      isRequired
-                      variant="secondary"
-                    />
+                    <field.AppTextField label="City" variant="secondary" />
                   )}
                 />
                 <form.AppField
                   name="address.postcode"
                   children={(field) => (
-                    <field.AppTextField
-                      label="Postcode"
-                      isRequired
-                      variant="secondary"
-                    />
+                    <field.AppTextField label="Postcode" variant="secondary" />
                   )}
                 />
                 <form.AppField
@@ -313,7 +263,6 @@ function RouteComponent() {
                     <field.AppComboBoxField
                       options={statesOptions}
                       label="State"
-                      isRequired
                       variant="secondary"
                     />
                   )}
@@ -323,7 +272,7 @@ function RouteComponent() {
 
             <div className="flex justify-end gap-2">
               <Link
-                to="/practitioners"
+                to="/patients"
                 className={buttonVariants({ variant: "ghost" })}
               >
                 Back
@@ -353,7 +302,7 @@ function PopulateClinicsOptions({
   return children({ clinics: data });
 }
 
-type Option = { section: string; items: { label: string; value: string }[] };
+type Option = { label: string; value: string }[];
 function PopulateSpecialtiesOptions({
   children,
 }: {
@@ -365,17 +314,9 @@ function PopulateSpecialtiesOptions({
 
   const options = useMemo(() => {
     if (!data) return [];
-    // return data.flatMap<Option>((o) => {
-    //   return o.fields.map((field) => ({ label: field.name, value: field.id }));
-    // });
-    return data.reduce<Option[]>((acc, item) => {
-      const obj = { section: item.category, items: [] } as Option;
-      obj.items = item.fields.map((field) => {
-        return { label: field.name, value: field.id };
-      });
-      acc.push(obj);
-      return acc;
-    }, []);
+    return data.flatMap<Option>((o) => {
+      return o.fields.map((field) => ({ label: field.name, value: field.id }));
+    });
   }, [data]);
 
   if (isError || isLoading || !data) {

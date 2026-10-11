@@ -8,7 +8,7 @@ import {
   toast,
   Typography,
 } from "@heroui/react";
-import { HouseIcon, TagPlusIcon } from "lucide-react";
+import { HouseIcon, StethoscopeIcon, TagPlusIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
@@ -17,15 +17,15 @@ import { RouteErrorComponent } from "#/components/routeErrorComponent.tsx";
 import { states } from "#/libs/address.ts";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
-import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
-import { zCreatePatientSchema } from "#/isomorphic/schema/patients.schema.ts";
+import { isDefinedError } from "@orpc/client";
+import { zPractitionerCreateSchema } from "#/isomorphic/schema/practitioners.schema.ts";
 import type {
-  CreatePatientSchema,
-  Patient,
-} from "#/isomorphic/schema/patients.schema.ts";
-import { EntityIcon } from "#/components/entityIcons.tsx";
+  Practitioner,
+  PractitionerCreateSchema,
+} from "#/isomorphic/schema/practitioners.schema.ts";
+import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
 
-export const Route = createFileRoute("/_private/patients_/new")({
+export const Route = createFileRoute("/_private/(practitioners)/practitioners_/new")({
   component: RouteComponent,
   errorComponent: RouteErrorComponent,
   ssr: "data-only",
@@ -33,15 +33,23 @@ export const Route = createFileRoute("/_private/patients_/new")({
 
 const statesOptions = states.map((v) => ({ label: v.state, value: v.state }));
 
-const defaultValues: CreatePatientSchema = {
+const defaultValues: PractitionerCreateSchema = {
   name: "",
+  status: "active",
   dob: "",
-  gender: "male",
   title: "MR",
-  identification_card: "",
-  email: "",
+  gender: "male",
+  identification_no: "",
   phone_number: "",
+  specialty_id: "",
   clinic_id: "",
+  address: {
+    address_one: "",
+    address_two: "",
+    city: "",
+    postcode: "",
+    state: "",
+  },
 };
 
 function RouteComponent() {
@@ -52,18 +60,19 @@ function RouteComponent() {
     defaultValues,
     onSubmit({ value }) {
       console.log("submitted", value, sanitizeForm(value));
-      patientMutation.mutate(sanitizeForm(value));
+      practitionerMutation.mutate(sanitizeForm(value));
     },
     validators: {
-      onChangeAsync: zCreatePatientSchema,
-      onSubmitAsync: zCreatePatientSchema,
+      onChangeAsync: zPractitionerCreateSchema,
+      onSubmitAsync: zPractitionerCreateSchema,
     },
   });
 
-  const patientMutation = useMutation(
-    orpc.createPatient.mutationOptions({
+  const practitionerMutation = useMutation(
+    orpc.createPractitioner.mutationOptions({
       onSettled: (data, err) => {
-        if (err) {
+        const narrowedError = isDefinedError(err);
+        if (narrowedError) {
           toast.danger(`Error`, {
             description: err.message || "Something wrong...",
           });
@@ -71,10 +80,10 @@ function RouteComponent() {
         }
         if (data) {
           toast.success(`Success`, {
-            description: "New patient has been added.",
+            description: "New practitioner has been added.",
           });
-          qc.invalidateQueries({ queryKey: orpc.listPatients.queryKey() });
-          nav({ to: "/patients" });
+          qc.invalidateQueries({ queryKey: orpc.listPractitioners.queryKey() });
+          nav({ to: "/practitioners" });
           return;
         }
       },
@@ -93,9 +102,27 @@ function RouteComponent() {
             }}
           >
             <div className="mb-3 flex gap-2 items-center">
-              <EntityIcon entity="patients" />
-              <Typography type="h3">New Patient</Typography>
+              <StethoscopeIcon />
+              <Typography type="h3">New Practitioner</Typography>
             </div>
+
+            <form.AppField
+              name="status"
+              children={(field) => (
+                <field.AppSelectField
+                  label="Status"
+                  isRequired
+                  options={
+                    [
+                      { label: "Active", value: "active" },
+                      { label: "Suspended", value: "suspended" },
+                      { label: "Inactive", value: "inactive" },
+                    ] as Array<{ label: string; value: Practitioner["status"] }>
+                  }
+                  variant="secondary"
+                />
+              )}
+            />
 
             <div className="flex gap-4">
               <form.AppField
@@ -128,7 +155,7 @@ function RouteComponent() {
             </div>
 
             <form.AppField
-              name="identification_card"
+              name="identification_no"
               children={(field) => (
                 <field.AppTextField
                   isRequired
@@ -152,7 +179,7 @@ function RouteComponent() {
                         { label: "Other", value: "other" },
                       ] as Array<{
                         label: string;
-                        value: Patient["gender"];
+                        value: Practitioner["gender"];
                       }>
                     }
                     variant="secondary"
@@ -182,7 +209,6 @@ function RouteComponent() {
                   />
                 )}
               />
-
               <form.AppField
                 name="email"
                 children={(field) => (
@@ -206,7 +232,7 @@ function RouteComponent() {
                         <field.AppComboBoxField
                           allowEmpty
                           variant="secondary"
-                          label="Clinic"
+                          label="Employed By"
                           options={clinics.map((v) => ({
                             label: v.name,
                             value: v.id,
@@ -214,6 +240,21 @@ function RouteComponent() {
                         />
                       )}
                     </PopulateClinicsOptions>
+                  )}
+                />
+                <form.AppField
+                  name="specialty_id"
+                  children={(field) => (
+                    <PopulateSpecialtiesOptions>
+                      {({ options }) => (
+                        <field.AppAutoCompleteField
+                          isRequired
+                          variant="secondary"
+                          label="Specialty"
+                          options={options}
+                        />
+                      )}
+                    </PopulateSpecialtiesOptions>
                   )}
                 />
               </div>
@@ -231,6 +272,7 @@ function RouteComponent() {
                     <field.AppTextField
                       label="Address one"
                       variant="secondary"
+                      isRequired
                     />
                   )}
                 />
@@ -248,13 +290,21 @@ function RouteComponent() {
                 <form.AppField
                   name="address.city"
                   children={(field) => (
-                    <field.AppTextField label="City" variant="secondary" />
+                    <field.AppTextField
+                      label="City"
+                      isRequired
+                      variant="secondary"
+                    />
                   )}
                 />
                 <form.AppField
                   name="address.postcode"
                   children={(field) => (
-                    <field.AppTextField label="Postcode" variant="secondary" />
+                    <field.AppTextField
+                      label="Postcode"
+                      isRequired
+                      variant="secondary"
+                    />
                   )}
                 />
                 <form.AppField
@@ -263,6 +313,7 @@ function RouteComponent() {
                     <field.AppComboBoxField
                       options={statesOptions}
                       label="State"
+                      isRequired
                       variant="secondary"
                     />
                   )}
@@ -272,7 +323,7 @@ function RouteComponent() {
 
             <div className="flex justify-end gap-2">
               <Link
-                to="/patients"
+                to="/practitioners"
                 className={buttonVariants({ variant: "ghost" })}
               >
                 Back
@@ -302,7 +353,7 @@ function PopulateClinicsOptions({
   return children({ clinics: data });
 }
 
-type Option = { label: string; value: string }[];
+type Option = { section: string; items: { label: string; value: string }[] };
 function PopulateSpecialtiesOptions({
   children,
 }: {
@@ -314,9 +365,17 @@ function PopulateSpecialtiesOptions({
 
   const options = useMemo(() => {
     if (!data) return [];
-    return data.flatMap<Option>((o) => {
-      return o.fields.map((field) => ({ label: field.name, value: field.id }));
-    });
+    // return data.flatMap<Option>((o) => {
+    //   return o.fields.map((field) => ({ label: field.name, value: field.id }));
+    // });
+    return data.reduce<Option[]>((acc, item) => {
+      const obj = { section: item.category, items: [] } as Option;
+      obj.items = item.fields.map((field) => {
+        return { label: field.name, value: field.id };
+      });
+      acc.push(obj);
+      return acc;
+    }, []);
   }, [data]);
 
   if (isError || isLoading || !data) {

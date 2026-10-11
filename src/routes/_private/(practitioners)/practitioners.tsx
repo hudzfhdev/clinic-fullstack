@@ -12,6 +12,7 @@ import {
   buttonVariants,
   SearchField,
   Surface,
+  Tooltip,
 } from "@heroui/react";
 import {
   createColumnHelper,
@@ -22,19 +23,22 @@ import { PlusCircleIcon } from "lucide-react";
 import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { EmptyTable } from "#/components/emptyTable.tsx";
 import { EntityIcon } from "#/components/entityIcons.tsx";
-import type { Patient } from "#/isomorphic/schema/patients.schema.ts";
+import type { Practitioner } from "#/isomorphic/schema/practitioners.schema.ts";
+import { transformTitle } from "#/utils/common.ts";
 
-export const Route = createFileRoute("/_private/patients")({
-  component: RouteComponent,
-  errorComponent: ErrorComponent,
-  pendingComponent: () => <Spinner />,
-  loader: ({ context }) =>
-    context.queryClient.query(orpc.listPatients.queryOptions()),
-});
+export const Route = createFileRoute("/_private/(practitioners)/practitioners")(
+  {
+    component: RouteComponent,
+    errorComponent: ErrorComponent,
+    pendingComponent: () => <Spinner />,
+    loader: ({ context }) =>
+      context.queryClient.query(orpc.listPractitioners.queryOptions()),
+  },
+);
 
 const features = tableFeatures({});
 
-const columnHelper = createColumnHelper<typeof features, Patient>();
+const columnHelper = createColumnHelper<typeof features, Practitioner>();
 const columns = columnHelper.columns([
   columnHelper.accessor("id", {
     header: "Unique ID",
@@ -44,15 +48,21 @@ const columns = columnHelper.columns([
       </Typography>
     ),
   }),
+  columnHelper.accessor("title", {
+    header: "Title",
+    cell: (rowInfo) => transformTitle(rowInfo.getValue()),
+  }),
   columnHelper.accessor("name", {
     header: "Full Name",
     cell: (rowInfo) => rowInfo.getValue(),
   }),
-  columnHelper.accessor("patient_no", {
-    header: "Patient No",
-    cell: (rowInfo) => (
-      <Typography type="code">{rowInfo.getValue()}</Typography>
-    ),
+  columnHelper.accessor("identification_no", {
+    header: "Identity Card",
+    cell: (rowInfo) => rowInfo.getValue(),
+  }),
+  columnHelper.accessor("status", {
+    header: "Status",
+    cell: (info) => info.getValue(),
   }),
   columnHelper.accessor("gender", {
     header: "Gender",
@@ -75,6 +85,19 @@ const columns = columnHelper.columns([
     header: "Phone Number",
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor("practitioners_specialties.name", {
+    header: "Field Specialty",
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor("clinics.name", {
+    header: "Clinic Name",
+    cell: (info) =>
+      info.getValue() || (
+        <Typography type="body-sm" className="text-muted">
+          Not Available
+        </Typography>
+      ),
+  }),
   columnHelper.display({
     id: "address",
     header: "Address",
@@ -85,27 +108,44 @@ const columns = columnHelper.columns([
         .filter(Boolean)
         .join(", ");
       return (
-        <Typography
-          type="body-sm"
-          truncate
-          color={!address ? "muted" : "default"}
-        >
-          {address || "Not Available"}
-        </Typography>
+        <Tooltip delay={0}>
+          <Tooltip.Trigger>
+            <Typography
+              type="body-sm"
+              truncate
+              className={address ? "max-w-48" : undefined}
+            >
+              {address}
+            </Typography>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
+            <Tooltip.Arrow />
+            <div>
+              <Typography type="body-sm">{address_one},</Typography>
+              {address_two ? (
+                <Typography type="body-sm">{address_two},</Typography>
+              ) : null}
+              <Typography type="body-sm">
+                {city} {postcode},
+              </Typography>
+              <Typography type="body-sm">{state}.</Typography>
+            </div>
+          </Tooltip.Content>
+        </Tooltip>
       );
     },
   }),
 ]);
 
 function RouteComponent() {
-  const patientList = useLoaderData({
-    from: "/_private/patients",
+  const practitionersList = useLoaderData({
+    from: "/_private/(practitioners)/practitioners",
     strict: true,
   });
   const table = useTable({
     features,
     columns,
-    data: patientList,
+    data: practitionersList,
     getRowId: (row) => row.id,
   });
 
@@ -114,26 +154,26 @@ function RouteComponent() {
       <Surface className="p-5 space-y-5">
         <div className="flex justify-between items-center">
           <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
-            <EntityIcon entity="patients" aria-hidden />
-            <Typography type="h3">Patients</Typography>
+            <EntityIcon entity="practitioners" aria-hidden />
+            <Typography type="h3">Practitioners</Typography>
             <Typography className="col-start-2" type="body" color="muted">
-              List of patients
+              List of practitioners
             </Typography>
           </div>
           <Link
             className={buttonVariants({ fullWidth: false })}
-            to="/patients/new"
+            to="/practitioners/new"
           >
             <PlusCircleIcon />
-            Add Patient
+            Add Practitioner
           </Link>
         </div>
 
         <div>
           <SearchField
-            className="md:w-96"
             variant="secondary"
-            aria-label="search patients"
+            className="md:w-96"
+            aria-label="search practitioners"
           >
             <SearchField.Group>
               <SearchField.SearchIcon />

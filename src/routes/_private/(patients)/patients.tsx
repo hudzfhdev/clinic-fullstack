@@ -1,66 +1,79 @@
-import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  ErrorComponent,
+  Link,
+  useLoaderData,
+} from "@tanstack/react-router";
 import { orpc } from "#/orpc/client";
 import {
   Table,
   Spinner,
   Typography,
   buttonVariants,
-  Surface,
   SearchField,
-  Link as HeroLink,
-  Button,
+  Surface,
 } from "@heroui/react";
 import {
   createColumnHelper,
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { EyeIcon, PlusCircleIcon } from "lucide-react";
-import { ClinicStatusChips } from "#/components/modules/clinics/clinicStatusChips.tsx";
+import { PlusCircleIcon } from "lucide-react";
 import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { EmptyTable } from "#/components/emptyTable.tsx";
 import { EntityIcon } from "#/components/entityIcons.tsx";
-import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
+import type { Patient } from "#/isomorphic/schema/patients.schema.ts";
 
-export const Route = createFileRoute("/_private/clinics")({
+export const Route = createFileRoute("/_private/(patients)/patients")({
   component: RouteComponent,
   errorComponent: ErrorComponent,
   pendingComponent: () => <Spinner />,
   loader: ({ context }) =>
-    context.queryClient.query(orpc.listClinics.queryOptions()),
+    context.queryClient.query(orpc.listPatients.queryOptions()),
 });
 
 const features = tableFeatures({});
 
-const columnHelper = createColumnHelper<typeof features, Clinic>();
+const columnHelper = createColumnHelper<typeof features, Patient>();
 const columns = columnHelper.columns([
   columnHelper.accessor("id", {
     header: "Unique ID",
     cell: (props) => (
-      <HeroLink
-        render={(p) => (
-          <span {...p}>
-            <Link
-              to={`/clinics/$id/details`}
-              params={{ id: props.row.original.id }}
-            >
-              {props.getValue()}
-            </Link>
-          </span>
-        )}
-      />
+      <Typography type="body-sm" truncate>
+        {props.getValue()}
+      </Typography>
     ),
   }),
   columnHelper.accessor("name", {
-    header: "Name",
+    header: "Full Name",
     cell: (rowInfo) => rowInfo.getValue(),
   }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell(rowInfo) {
-      return <ClinicStatusChips status={rowInfo.getValue()} />;
-    },
+  columnHelper.accessor("patient_no", {
+    header: "Patient No",
+    cell: (rowInfo) => (
+      <Typography type="code">{rowInfo.getValue()}</Typography>
+    ),
+  }),
+  columnHelper.accessor("gender", {
+    header: "Gender",
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor("dob", {
+    header: "Date of Birth",
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor("email", {
+    header: "Email",
+    cell: (info) =>
+      info.getValue() || (
+        <Typography type="body-sm" className="text-muted">
+          Not Available
+        </Typography>
+      ),
+  }),
+  columnHelper.accessor("phone_number", {
+    header: "Phone Number",
+    cell: (info) => info.getValue(),
   }),
   columnHelper.display({
     id: "address",
@@ -68,11 +81,16 @@ const columns = columnHelper.columns([
     cell: ({ row }) => {
       const { address_one, city, postcode, state, address_two } =
         row.original.address ?? {};
+      const address = [address_one, address_two, city, state, postcode]
+        .filter(Boolean)
+        .join(", ");
       return (
-        <Typography type="body-sm" truncate>
-          {[address_one, address_two, city, state, postcode]
-            .filter(Boolean)
-            .join(", ")}
+        <Typography
+          type="body-sm"
+          truncate
+          color={!address ? "muted" : "default"}
+        >
+          {address || "Not Available"}
         </Typography>
       );
     },
@@ -80,49 +98,54 @@ const columns = columnHelper.columns([
 ]);
 
 function RouteComponent() {
-  const { data: clinics } = useSuspenseQuery(orpc.listClinics.queryOptions());
+  const patientList = useLoaderData({
+    from: "/_private/(patients)/patients",
+    strict: true,
+  });
   const table = useTable({
     features,
     columns,
-    data: clinics,
+    data: patientList,
     getRowId: (row) => row.id,
   });
 
   return (
     <AppPageLayout>
-      <Surface className="space-y-5 p-5">
+      <Surface className="p-5 space-y-5">
         <div className="flex justify-between items-center">
           <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
-            <EntityIcon entity="clinics" aria-hidden />
-            <Typography type="h3">Clinis</Typography>
+            <EntityIcon entity="patients" aria-hidden />
+            <Typography type="h3">Patients</Typography>
             <Typography className="col-start-2" type="body" color="muted">
-              List of clinics
+              List of patients
             </Typography>
           </div>
           <Link
             className={buttonVariants({ fullWidth: false })}
-            to="/clinics/new"
+            to="/patients/new"
           >
             <PlusCircleIcon />
-            Add Clinic
+            Add Patient
           </Link>
         </div>
 
-        <SearchField
-          className="md:w-96"
-          variant="secondary"
-          aria-label="search clinics"
-        >
-          <SearchField.Group>
-            <SearchField.SearchIcon />
-            <SearchField.Input placeholder="Search..." />
-            <SearchField.ClearButton />
-          </SearchField.Group>
-        </SearchField>
+        <div>
+          <SearchField
+            className="md:w-96"
+            variant="secondary"
+            aria-label="search patients"
+          >
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input placeholder="Search..." />
+              <SearchField.ClearButton />
+            </SearchField.Group>
+          </SearchField>
+        </div>
 
         <Table>
           <Table.ScrollContainer>
-            <Table.Content aria-label="list of clinics">
+            <Table.Content aria-label="list of practitioners">
               {table.getHeaderGroups().map((headerGroup) => (
                 <Table.Header key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (

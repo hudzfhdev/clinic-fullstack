@@ -22,7 +22,7 @@ import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { zClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 import type { ClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 
-export const Route = createFileRoute("/_private/clinics_/new")({
+export const Route = createFileRoute("/_private/(clinics)/clinics_/new")({
   component: RouteComponent,
   head: () => ({ meta: [{ title: "New Clinic" }] }),
   errorComponent: ErrorComponent,
