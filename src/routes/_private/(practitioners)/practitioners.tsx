@@ -43,9 +43,14 @@ const columns = columnHelper.columns([
   columnHelper.accessor("id", {
     header: "Unique ID",
     cell: (props) => (
-      <Typography type="body-sm" truncate>
-        {props.getValue()}
-      </Typography>
+      <Link
+        to="/practitioners/$id/details"
+        params={{ id: props.row.original.id }}
+      >
+        <Typography type="body-sm" truncate>
+          {props.getValue()}
+        </Typography>
+      </Link>
     ),
   }),
   columnHelper.accessor("title", {

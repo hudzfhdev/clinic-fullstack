@@ -24,6 +24,10 @@ import { Route as PrivateclinicsClinicsNewRouteImport } from './routes/_private/
 import { Route as PrivatepatientsPatientsNewRouteImport } from './routes/_private/(patients)/patients_.new'
 import { Route as PrivatepractitionersPractitionersNewRouteImport } from './routes/_private/(practitioners)/practitioners_.new'
 import { Route as PrivateclinicsClinicsIdDetailsRouteImport } from './routes/_private/(clinics)/clinics_.$id.details'
+import { Route as PrivateclinicsClinicsIdRoomsRouteImport } from './routes/_private/(clinics)/clinics_.$id.rooms'
+import { Route as PrivateclinicsClinicsIdServicesRouteImport } from './routes/_private/(clinics)/clinics_.$id.services'
+import { Route as PrivatepatientsPatientsIdDetailsRouteImport } from './routes/_private/(patients)/patients_.$id.details'
+import { Route as PrivatepractitionersPractitionersIdDetailsRouteImport } from './routes/_private/(practitioners)/practitioners_.$id.details'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -104,6 +108,30 @@ const PrivateclinicsClinicsIdDetailsRoute =
     path: '/details',
     getParentRoute: () => PrivateclinicsClinicsIdRoute,
   } as any)
+const PrivateclinicsClinicsIdRoomsRoute =
+  PrivateclinicsClinicsIdRoomsRouteImport.update({
+    id: '/rooms',
+    path: '/rooms',
+    getParentRoute: () => PrivateclinicsClinicsIdRoute,
+  } as any)
+const PrivateclinicsClinicsIdServicesRoute =
+  PrivateclinicsClinicsIdServicesRouteImport.update({
+    id: '/services',
+    path: '/services',
+    getParentRoute: () => PrivateclinicsClinicsIdRoute,
+  } as any)
+const PrivatepatientsPatientsIdDetailsRoute =
+  PrivatepatientsPatientsIdDetailsRouteImport.update({
+    id: '/(patients)/patients_/$id/details',
+    path: '/patients/$id/details',
+    getParentRoute: () => PrivateRoute,
+  } as any)
+const PrivatepractitionersPractitionersIdDetailsRoute =
+  PrivatepractitionersPractitionersIdDetailsRouteImport.update({
+    id: '/(practitioners)/practitioners_/$id/details',
+    path: '/practitioners/$id/details',
+    getParentRoute: () => PrivateRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,6 +148,10 @@ export interface FileRoutesByFullPath {
   '/patients/new': typeof PrivatepatientsPatientsNewRoute
   '/practitioners/new': typeof PrivatepractitionersPractitionersNewRoute
   '/clinics/$id/details': typeof PrivateclinicsClinicsIdDetailsRoute
+  '/clinics/$id/rooms': typeof PrivateclinicsClinicsIdRoomsRoute
+  '/clinics/$id/services': typeof PrivateclinicsClinicsIdServicesRoute
+  '/patients/$id/details': typeof PrivatepatientsPatientsIdDetailsRoute
+  '/practitioners/$id/details': typeof PrivatepractitionersPractitionersIdDetailsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -136,6 +168,10 @@ export interface FileRoutesByTo {
   '/patients/new': typeof PrivatepatientsPatientsNewRoute
   '/practitioners/new': typeof PrivatepractitionersPractitionersNewRoute
   '/clinics/$id/details': typeof PrivateclinicsClinicsIdDetailsRoute
+  '/clinics/$id/rooms': typeof PrivateclinicsClinicsIdRoomsRoute
+  '/clinics/$id/services': typeof PrivateclinicsClinicsIdServicesRoute
+  '/patients/$id/details': typeof PrivatepatientsPatientsIdDetailsRoute
+  '/practitioners/$id/details': typeof PrivatepractitionersPractitionersIdDetailsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,6 +190,10 @@ export interface FileRoutesById {
   '/_private/(patients)/patients_/new': typeof PrivatepatientsPatientsNewRoute
   '/_private/(practitioners)/practitioners_/new': typeof PrivatepractitionersPractitionersNewRoute
   '/_private/(clinics)/clinics_/$id/details': typeof PrivateclinicsClinicsIdDetailsRoute
+  '/_private/(clinics)/clinics_/$id/rooms': typeof PrivateclinicsClinicsIdRoomsRoute
+  '/_private/(clinics)/clinics_/$id/services': typeof PrivateclinicsClinicsIdServicesRoute
+  '/_private/(patients)/patients_/$id/details': typeof PrivatepatientsPatientsIdDetailsRoute
+  '/_private/(practitioners)/practitioners_/$id/details': typeof PrivatepractitionersPractitionersIdDetailsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,6 +212,10 @@ export interface FileRouteTypes {
     | '/patients/new'
     | '/practitioners/new'
     | '/clinics/$id/details'
+    | '/clinics/$id/rooms'
+    | '/clinics/$id/services'
+    | '/patients/$id/details'
+    | '/practitioners/$id/details'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +232,10 @@ export interface FileRouteTypes {
     | '/patients/new'
     | '/practitioners/new'
     | '/clinics/$id/details'
+    | '/clinics/$id/rooms'
+    | '/clinics/$id/services'
+    | '/patients/$id/details'
+    | '/practitioners/$id/details'
   id:
     | '__root__'
     | '/'
@@ -205,6 +253,10 @@ export interface FileRouteTypes {
     | '/_private/(patients)/patients_/new'
     | '/_private/(practitioners)/practitioners_/new'
     | '/_private/(clinics)/clinics_/$id/details'
+    | '/_private/(clinics)/clinics_/$id/rooms'
+    | '/_private/(clinics)/clinics_/$id/services'
+    | '/_private/(patients)/patients_/$id/details'
+    | '/_private/(practitioners)/practitioners_/$id/details'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -321,16 +373,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateclinicsClinicsIdDetailsRouteImport
       parentRoute: typeof PrivateclinicsClinicsIdRoute
     }
+    '/_private/(clinics)/clinics_/$id/rooms': {
+      id: '/_private/(clinics)/clinics_/$id/rooms'
+      path: '/rooms'
+      fullPath: '/clinics/$id/rooms'
+      preLoaderRoute: typeof PrivateclinicsClinicsIdRoomsRouteImport
+      parentRoute: typeof PrivateclinicsClinicsIdRoute
+    }
+    '/_private/(clinics)/clinics_/$id/services': {
+      id: '/_private/(clinics)/clinics_/$id/services'
+      path: '/services'
+      fullPath: '/clinics/$id/services'
+      preLoaderRoute: typeof PrivateclinicsClinicsIdServicesRouteImport
+      parentRoute: typeof PrivateclinicsClinicsIdRoute
+    }
+    '/_private/(patients)/patients_/$id/details': {
+      id: '/_private/(patients)/patients_/$id/details'
+      path: '/patients/$id/details'
+      fullPath: '/patients/$id/details'
+      preLoaderRoute: typeof PrivatepatientsPatientsIdDetailsRouteImport
+      parentRoute: typeof PrivateRoute
+    }
+    '/_private/(practitioners)/practitioners_/$id/details': {
+      id: '/_private/(practitioners)/practitioners_/$id/details'
+      path: '/practitioners/$id/details'
+      fullPath: '/practitioners/$id/details'
+      preLoaderRoute: typeof PrivatepractitionersPractitionersIdDetailsRouteImport
+      parentRoute: typeof PrivateRoute
+    }
   }
 }
 
 interface PrivateclinicsClinicsIdRouteChildren {
   PrivateclinicsClinicsIdDetailsRoute: typeof PrivateclinicsClinicsIdDetailsRoute
+  PrivateclinicsClinicsIdRoomsRoute: typeof PrivateclinicsClinicsIdRoomsRoute
+  PrivateclinicsClinicsIdServicesRoute: typeof PrivateclinicsClinicsIdServicesRoute
 }
 
 const PrivateclinicsClinicsIdRouteChildren: PrivateclinicsClinicsIdRouteChildren =
   {
     PrivateclinicsClinicsIdDetailsRoute: PrivateclinicsClinicsIdDetailsRoute,
+    PrivateclinicsClinicsIdRoomsRoute: PrivateclinicsClinicsIdRoomsRoute,
+    PrivateclinicsClinicsIdServicesRoute: PrivateclinicsClinicsIdServicesRoute,
   }
 
 const PrivateclinicsClinicsIdRouteWithChildren =
@@ -349,6 +433,8 @@ interface PrivateRouteChildren {
   PrivateclinicsClinicsNewRoute: typeof PrivateclinicsClinicsNewRoute
   PrivatepatientsPatientsNewRoute: typeof PrivatepatientsPatientsNewRoute
   PrivatepractitionersPractitionersNewRoute: typeof PrivatepractitionersPractitionersNewRoute
+  PrivatepatientsPatientsIdDetailsRoute: typeof PrivatepatientsPatientsIdDetailsRoute
+  PrivatepractitionersPractitionersIdDetailsRoute: typeof PrivatepractitionersPractitionersIdDetailsRoute
 }
 
 const PrivateRouteChildren: PrivateRouteChildren = {
@@ -364,6 +450,9 @@ const PrivateRouteChildren: PrivateRouteChildren = {
   PrivatepatientsPatientsNewRoute: PrivatepatientsPatientsNewRoute,
   PrivatepractitionersPractitionersNewRoute:
     PrivatepractitionersPractitionersNewRoute,
+  PrivatepatientsPatientsIdDetailsRoute: PrivatepatientsPatientsIdDetailsRoute,
+  PrivatepractitionersPractitionersIdDetailsRoute:
+    PrivatepractitionersPractitionersIdDetailsRoute,
 }
 
 const PrivateRouteWithChildren =

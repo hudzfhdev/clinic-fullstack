@@ -4,7 +4,7 @@ import {
   zCreatePatientSchema,
   zPatientSchema,
 } from "#/isomorphic/schema/patients.schema.ts";
-import { os } from "@orpc/server";
+import { ORPCError, os } from "@orpc/server";
 import { customAlphabet } from "nanoid";
 import { z } from "zod";
 
@@ -36,4 +36,17 @@ export const createPatient = os
       })
       .returning();
     return newPatient;
+  });
+
+export const getPatientByID = os
+  .input(z.object({ id: z.uuid() }))
+  .output(zPatientSchema)
+  .handler(async (ctx) => {
+    const patient = await db.query.patients.findFirst({
+      where: { id: ctx.input.id },
+    });
+    if (!patient) {
+      throw new ORPCError("NOT_FOUND", { message: "Patient not found." });
+    }
+    return patient;
   });

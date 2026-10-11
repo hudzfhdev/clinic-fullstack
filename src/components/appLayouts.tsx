@@ -1,5 +1,10 @@
-import { Link as TRRLink } from "@tanstack/react-router";
-import { Drawer, Button, Link } from "@heroui/react";
+import { MatchRoute, Link } from "@tanstack/react-router";
+import {
+  Drawer,
+  Button,
+  Link as HeroLink,
+  buttonVariants,
+} from "@heroui/react";
 import { LayoutDashboardIcon, MenuIcon } from "lucide-react";
 import { useState } from "react";
 import type { ComponentType, PropsWithChildren, SVGProps } from "react";
@@ -9,17 +14,33 @@ import { mapEntityIcon } from "./entityIcons";
 export function AppPageLayout({
   children,
   className,
-}: PropsWithChildren & { className?: string }) {
+  isFullWidth = true,
+}: PropsWithChildren & { isFullWidth?: boolean; className?: string }) {
   return (
-    <main className={cn("p-6 w-full bg-background grow", className)}>
+    <main
+      className={cn(
+        "p-6 bg-background grow",
+        { "w-full": isFullWidth },
+        className,
+      )}
+    >
       {children}
     </main>
   );
 }
 
-export function AppHeader({ children }: PropsWithChildren) {
+export function AppPrivateLayout({ children }: PropsWithChildren) {
   return (
-    <header className="flex justify-between p-3 shadow-md sticky top-0 bg-surface z-10">
+    <div className="flex flex-col h-full">
+      <AppHeader />
+      {children}
+    </div>
+  );
+}
+
+function AppHeader({ children }: PropsWithChildren) {
+  return (
+    <header className="flex p-3 shadow-md sticky min-h-16 top-0 bg-surface z-10">
       <div className="flex gap-2 items-center">
         <AppSidebar />
       </div>
@@ -64,24 +85,30 @@ function AppSidebar() {
             <Drawer.Body>
               <nav className="flex flex-col gap-1">
                 {navItems.map((item) => (
-                  <Link
+                  <HeroLink
                     key={item.label}
                     onPress={() => setOpen(false)}
                     render={({ className, ...props }) => (
-                      <span {...props}>
-                        <TRRLink
-                          to={item.to}
-                          className={cn(
-                            className,
-                            "flex items-center gap-3 no-underline w-full px-3 py-2.5",
-                            "rounded-xl text-sm text-foreground transition-colors hover:bg-default",
-                            "data-[status='active']:bg-default ",
-                          )}
-                        >
-                          <item.icon className="size-5 text-muted" />
-                          {item.label}
-                        </TRRLink>
-                      </span>
+                      <MatchRoute to={item.to} fuzzy={false}>
+                        {(match) => (
+                          <span {...props}>
+                            <Link
+                              to={item.to}
+                              className={cn(
+                                className,
+                                "flex items-center gap-3 no-underline w-full px-3 py-2.5",
+                                "rounded-xl text-sm text-foreground transition-colors hover:bg-default",
+                                {
+                                  "data-[status='active']:bg-default": !!match,
+                                },
+                              )}
+                            >
+                              <item.icon className="size-5 text-muted" />
+                              {item.label}
+                            </Link>
+                          </span>
+                        )}
+                      </MatchRoute>
                     )}
                   />
                 ))}

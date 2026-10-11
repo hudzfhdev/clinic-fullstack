@@ -1,17 +1,27 @@
-import { HospitalIcon, IvBagIcon, StethoscopeIcon } from "lucide-react";
+import {
+  AmbulanceIcon,
+  CalendarClockIcon,
+  DoorClosedIcon,
+  HospitalIcon,
+  IvBagIcon,
+  StethoscopeIcon,
+} from "lucide-react";
 import type { ComponentProps } from "react";
 
 export const mapEntityIcon = {
   clinics: HospitalIcon,
   patients: IvBagIcon,
   practitioners: StethoscopeIcon,
+  rooms: DoorClosedIcon,
+  services: AmbulanceIcon,
+  appointments: CalendarClockIcon,
 } as const;
 
 export function EntityIcon({
   entity,
   ...props
 }: ComponentProps<"svg"> & {
-  entity: "clinics" | "patients" | "practitioners";
+  entity: keyof typeof mapEntityIcon;
 }) {
   const Icon = mapEntityIcon[entity];
   return <Icon {...props} />;

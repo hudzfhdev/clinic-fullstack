@@ -35,9 +35,5 @@ function RouteComponent() {
     from: "/_private/(clinics)/clinics_/$id/details",
     strict: true,
   });
-  return (
-    <Surface className="p-5">
-      <pre>{JSON.stringify(clinic, null, 2)}</pre>
-    </Surface>
-  );
+  return <pre>{JSON.stringify(clinic, null, 2)}</pre>;
 }
