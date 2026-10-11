@@ -1,4 +1,4 @@
-import { patients } from "#/db/db.schema.ts";
+import { patientsTable } from "#/db/db.schema.ts";
 import { db } from "#/db/index.ts";
 import {
   zCreatePatientSchema,
@@ -21,9 +21,10 @@ export const createPatient = os
     const patient_no = `PMC-${genNanoID}`;
 
     const [newPatient] = await db
-      .insert(patients)
+      .insert(patientsTable)
       .values({
         clinic_id: input.clinic_id,
+        title: input.title,
         dob: input.dob,
         gender: input.gender,
         identification_card: input.identification_card,

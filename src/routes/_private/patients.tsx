@@ -19,8 +19,8 @@ import {
   useTable,
 } from "@tanstack/react-table";
 import { PlusCircleIcon } from "lucide-react";
-import { AppPageLayout } from "#/components/app-layouts.tsx";
-import { EmptyTable } from "#/components/empty-table";
+import { AppPageLayout } from "#/components/appLayouts.tsx";
+import { EmptyTable } from "#/components/emptyTable.tsx";
 import { EntityIcon } from "#/components/entityIcons.tsx";
 import type { Patient } from "#/isomorphic/schema/patients.schema.ts";
 
@@ -81,11 +81,16 @@ const columns = columnHelper.columns([
     cell: ({ row }) => {
       const { address_one, city, postcode, state, address_two } =
         row.original.address ?? {};
+      const address = [address_one, address_two, city, state, postcode]
+        .filter(Boolean)
+        .join(", ");
       return (
-        <Typography type="body-sm" truncate>
-          {[address_one, address_two, city, state, postcode]
-            .filter(Boolean)
-            .join(", ")}
+        <Typography
+          type="body-sm"
+          truncate
+          color={!address ? "muted" : "default"}
+        >
+          {address || "Not Available"}
         </Typography>
       );
     },

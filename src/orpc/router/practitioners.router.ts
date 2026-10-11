@@ -1,7 +1,7 @@
 import { db } from "#/db/index.ts";
 import { ORPCError, os } from "@orpc/server";
 import { z } from "zod";
-import { practitioners } from "#/db/db.schema.ts";
+import { practitionersTable } from "#/db/db.schema.ts";
 import { sql } from "drizzle-orm";
 import { zPractitionerCreateSchema } from "#/isomorphic/schema/practitioners.schema.ts";
 
@@ -47,9 +47,10 @@ export const createPractitioner = os
     }
 
     const [newPractitioner] = await db
-      .insert(practitioners)
+      .insert(practitionersTable)
       .values({
         name: input.name,
+        title: input.title,
         dob: input.dob,
         gender: input.gender,
         address: input.address,

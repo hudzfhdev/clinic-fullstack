@@ -6,17 +6,14 @@ import { zSpecialtySchema } from "./specialties.schema";
 export const zPractitionerSchema = z
   .object({
     id: z.uuid(),
+    title: z.union([z.literal("MR"), z.literal("MRS")]),
     name: z.string().min(3),
     status: z.union([
       z.literal("active"),
       z.literal("inactive"),
       z.literal("suspended"),
     ]),
-    gender: z.union([
-      z.literal("male"),
-      z.literal("female"),
-      z.literal("other"),
-    ]),
+    gender: z.union([z.literal("male"), z.literal("female")]),
     dob: z.string(),
     identification_no: z.string().length(12),
     phone_number: z

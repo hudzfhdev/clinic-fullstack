@@ -8,16 +8,18 @@ import {
   buttonVariants,
   Surface,
   SearchField,
+  Link as HeroLink,
+  Button,
 } from "@heroui/react";
 import {
   createColumnHelper,
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { PlusCircleIcon } from "lucide-react";
-import { ClinicStatusChips } from "#/components/clinics/status-chips.tsx";
-import { AppPageLayout } from "#/components/app-layouts.tsx";
-import { EmptyTable } from "#/components/empty-table";
+import { EyeIcon, PlusCircleIcon } from "lucide-react";
+import { ClinicStatusChips } from "#/components/modules/clinics/clinicStatusChips.tsx";
+import { AppPageLayout } from "#/components/appLayouts.tsx";
+import { EmptyTable } from "#/components/emptyTable.tsx";
 import { EntityIcon } from "#/components/entityIcons.tsx";
 import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
 
@@ -36,9 +38,18 @@ const columns = columnHelper.columns([
   columnHelper.accessor("id", {
     header: "Unique ID",
     cell: (props) => (
-      <Typography type="body-sm" truncate>
-        {props.getValue()}
-      </Typography>
+      <HeroLink
+        render={(p) => (
+          <span {...p}>
+            <Link
+              to={`/clinics/$id/details`}
+              params={{ id: props.row.original.id }}
+            >
+              {props.getValue()}
+            </Link>
+          </span>
+        )}
+      />
     ),
   }),
   columnHelper.accessor("name", {

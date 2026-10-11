@@ -1,4 +1,4 @@
-import { AppHeader } from "#/components/app-layouts.tsx";
+import { AppHeader } from "#/components/appLayouts.tsx";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_private")({

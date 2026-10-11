@@ -12,7 +12,7 @@ import { HouseIcon, StethoscopeIcon, TagPlusIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
-import { AppPageLayout } from "#/components/app-layouts.tsx";
+import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { RouteErrorComponent } from "#/components/routeErrorComponent.tsx";
 import { states } from "#/libs/address.ts";
 import { useMemo } from "react";
@@ -37,6 +37,7 @@ const defaultValues: PractitionerCreateSchema = {
   name: "",
   status: "active",
   dob: "",
+  title: "MR",
   gender: "male",
   identification_no: "",
   phone_number: "",
@@ -100,7 +101,7 @@ function RouteComponent() {
               form.handleSubmit(e);
             }}
           >
-            <div className="mb-3 flex gap-4 items-center">
+            <div className="mb-3 flex gap-2 items-center">
               <StethoscopeIcon />
               <Typography type="h3">New Practitioner</Typography>
             </div>
@@ -123,17 +124,35 @@ function RouteComponent() {
               )}
             />
 
-            <form.AppField
-              name="name"
-              children={(field) => (
-                <field.AppTextField
-                  isRequired
-                  label="Full Name"
-                  description="Must follow IC name"
-                  variant="secondary"
-                />
-              )}
-            />
+            <div className="flex gap-4">
+              <form.AppField
+                name="title"
+                children={(field) => (
+                  <field.AppSelectField
+                    isRequired
+                    className="w-32"
+                    label="Title"
+                    variant="secondary"
+                    options={[
+                      { label: "Mr.", value: "MR" },
+                      { label: "Mrs.", value: "MRS" },
+                    ]}
+                  />
+                )}
+              />
+              <form.AppField
+                name="name"
+                children={(field) => (
+                  <field.AppTextField
+                    isRequired
+                    fullWidth
+                    label="Full Name"
+                    description="Must follow IC name"
+                    variant="secondary"
+                  />
+                )}
+              />
+            </div>
 
             <form.AppField
               name="identification_no"
@@ -179,16 +198,24 @@ function RouteComponent() {
               />
             </div>
 
-            <form.AppField
-              name="phone_number"
-              children={(field) => (
-                <field.AppTextField
-                  isRequired
-                  label="Phone Number"
-                  variant="secondary"
-                />
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <form.AppField
+                name="phone_number"
+                children={(field) => (
+                  <field.AppTextField
+                    isRequired
+                    label="Phone Number"
+                    variant="secondary"
+                  />
+                )}
+              />
+              <form.AppField
+                name="email"
+                children={(field) => (
+                  <field.AppTextField label="Email" variant="secondary" />
+                )}
+              />
+            </div>
 
             <div className="space-y-4">
               <div className="flex items-center gap-2 border-b py-2 border-b-accent-soft">
@@ -220,7 +247,7 @@ function RouteComponent() {
                   children={(field) => (
                     <PopulateSpecialtiesOptions>
                       {({ options }) => (
-                        <field.AppComboBoxField
+                        <field.AppAutoCompleteField
                           isRequired
                           variant="secondary"
                           label="Specialty"
@@ -326,7 +353,7 @@ function PopulateClinicsOptions({
   return children({ clinics: data });
 }
 
-type Option = { label: string; value: string }[];
+type Option = { section: string; items: { label: string; value: string }[] };
 function PopulateSpecialtiesOptions({
   children,
 }: {
@@ -338,9 +365,17 @@ function PopulateSpecialtiesOptions({
 
   const options = useMemo(() => {
     if (!data) return [];
-    return data.flatMap<Option>((o) => {
-      return o.fields.map((field) => ({ label: field.name, value: field.id }));
-    });
+    // return data.flatMap<Option>((o) => {
+    //   return o.fields.map((field) => ({ label: field.name, value: field.id }));
+    // });
+    return data.reduce<Option[]>((acc, item) => {
+      const obj = { section: item.category, items: [] } as Option;
+      obj.items = item.fields.map((field) => {
+        return { label: field.name, value: field.id };
+      });
+      acc.push(obj);
+      return acc;
+    }, []);
   }, [data]);
 
   if (isError || isLoading || !data) {

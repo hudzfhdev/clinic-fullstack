@@ -12,6 +12,7 @@ import {
   buttonVariants,
   SearchField,
   Surface,
+  Tooltip,
 } from "@heroui/react";
 import {
   createColumnHelper,
@@ -19,10 +20,11 @@ import {
   useTable,
 } from "@tanstack/react-table";
 import { PlusCircleIcon } from "lucide-react";
-import { AppPageLayout } from "#/components/app-layouts.tsx";
-import { EmptyTable } from "#/components/empty-table";
+import { AppPageLayout } from "#/components/appLayouts.tsx";
+import { EmptyTable } from "#/components/emptyTable.tsx";
 import { EntityIcon } from "#/components/entityIcons.tsx";
 import type { Practitioner } from "#/isomorphic/schema/practitioners.schema.ts";
+import { transformTitle } from "#/utils/common.ts";
 
 export const Route = createFileRoute("/_private/practitioners")({
   component: RouteComponent,
@@ -43,6 +45,10 @@ const columns = columnHelper.columns([
         {props.getValue()}
       </Typography>
     ),
+  }),
+  columnHelper.accessor("title", {
+    header: "Title",
+    cell: (rowInfo) => transformTitle(rowInfo.getValue()),
   }),
   columnHelper.accessor("name", {
     header: "Full Name",
@@ -84,7 +90,7 @@ const columns = columnHelper.columns([
   columnHelper.accessor("clinics.name", {
     header: "Clinic Name",
     cell: (info) =>
-      info.row.original.clinics?.name || (
+      info.getValue() || (
         <Typography type="body-sm" className="text-muted">
           Not Available
         </Typography>
@@ -96,12 +102,34 @@ const columns = columnHelper.columns([
     cell: ({ row }) => {
       const { address_one, city, postcode, state, address_two } =
         row.original.address ?? {};
+      const address = [address_one, address_two, city, state, postcode]
+        .filter(Boolean)
+        .join(", ");
       return (
-        <Typography type="body-sm" truncate>
-          {[address_one, address_two, city, state, postcode]
-            .filter(Boolean)
-            .join(", ")}
-        </Typography>
+        <Tooltip delay={0}>
+          <Tooltip.Trigger>
+            <Typography
+              type="body-sm"
+              truncate
+              className={address ? "max-w-48" : undefined}
+            >
+              {address}
+            </Typography>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
+            <Tooltip.Arrow />
+            <div>
+              <Typography type="body-sm">{address_one},</Typography>
+              {address_two ? (
+                <Typography type="body-sm">{address_two},</Typography>
+              ) : null}
+              <Typography type="body-sm">
+                {city} {postcode},
+              </Typography>
+              <Typography type="body-sm">{state}.</Typography>
+            </div>
+          </Tooltip.Content>
+        </Tooltip>
       );
     },
   }),

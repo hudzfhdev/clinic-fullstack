@@ -14,8 +14,13 @@ import {
   I18nProvider,
   Header,
   Separator,
+  Autocomplete,
+  useFilter,
+  SearchField,
+  EmptyState,
 } from "@heroui/react";
 import type {
+  AutocompleteProps,
   DatePickerProps,
   DateValue,
   SelectProps,
@@ -37,6 +42,7 @@ export const { useAppForm } = createFormHook({
     AppSelectField,
     AppComboBoxField,
     AppDatePickerField,
+    AppAutoCompleteField,
   },
   formComponents: {},
 });
@@ -156,7 +162,7 @@ function AppComboBoxField<
   options: TOption[];
   allowEmpty?: boolean;
 }) {
-  const field = formHookContexts.useFieldContext<string>();
+  const field = formHookContexts.useFieldContext<any>();
   const error = field.state.meta.errors.find((err) =>
     err.path.includes(field.name),
   );
@@ -322,5 +328,99 @@ function AppDatePickerField({
         </DatePicker.Popover>
       </DatePicker>
     </I18nProvider>
+  );
+}
+
+function AppAutoCompleteField<
+  TItem extends
+    | { label: string; value: string }
+    | { section: string; items: Array<{ label: string; value: string }> },
+  TMode extends "single" | "multiple" = "single",
+>({
+  label,
+  description,
+  options,
+  ...props
+}: AutocompleteProps<TItem, TMode> & {
+  label: string;
+  description?: string;
+  options: TItem[];
+}) {
+  const filter = useFilter({ sensitivity: "base" });
+  const field = formHookContexts.useFieldContext<any>();
+
+  const error = field.state.meta.errors.find((err) =>
+    err.path.includes(field.name),
+  );
+
+  const isInvalid =
+    !!error?.message &&
+    !field.state.meta.isValid &&
+    field.state.meta.isTouched &&
+    !field.state.meta.isBlurred;
+
+  return (
+    <Autocomplete
+      {...props}
+      name={field.name}
+      id={field.name}
+      isInvalid={isInvalid}
+      value={field.state.value}
+      onBlur={field.handleBlur}
+      onChange={(value) => {
+        if (!value) {
+          if (Array.isArray(value)) field.handleChange([]);
+          else if (typeof value === "string") field.handleChange("");
+          else field.handleChange(value);
+          return;
+        }
+        field.handleChange(value);
+      }}
+    >
+      <Label>{label}</Label>
+      <Autocomplete.Trigger>
+        <Autocomplete.Value />
+        <Autocomplete.ClearButton />
+        <Autocomplete.Indicator />
+      </Autocomplete.Trigger>
+      <Autocomplete.Popover>
+        <Autocomplete.Filter filter={filter.contains}>
+          <SearchField aria-label={`search ${label}`}>
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input placeholder="Search..." />
+              <SearchField.ClearButton />
+            </SearchField.Group>
+          </SearchField>
+          <ListBox
+            renderEmptyState={() => <EmptyState>No results found</EmptyState>}
+          >
+            {options.map((option, index) => {
+              if ("section" in option) {
+                return (
+                  <Fragment key={option.section}>
+                    <ListBox.Section>
+                      <Header>{option.section}</Header>
+                      {option.items.map((item) => (
+                        <ListBox.Item id={item.value} textValue={item.label}>
+                          {item.label}
+                        </ListBox.Item>
+                      ))}
+                      {index === options.length - 1 ? <Separator /> : null}
+                    </ListBox.Section>
+                    <Separator />
+                  </Fragment>
+                );
+              }
+              return (
+                <ListBox.Item id={option.value} textValue={option.label}>
+                  {option.label}
+                </ListBox.Item>
+              );
+            })}
+          </ListBox>
+        </Autocomplete.Filter>
+      </Autocomplete.Popover>
+    </Autocomplete>
   );
 }

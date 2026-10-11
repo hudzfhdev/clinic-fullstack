@@ -1,7 +1,7 @@
-import { AppPageLayout } from "#/components/app-layouts";
+import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { RouteErrorComponent } from "#/components/routeErrorComponent";
 import { orpc } from "#/orpc/client";
-import { Alert, Button, Spinner } from "@heroui/react";
+import { Alert, Button, Spinner, Surface } from "@heroui/react";
 import {
   createFileRoute,
   ErrorComponent,
@@ -9,7 +9,9 @@ import {
 } from "@tanstack/react-router";
 import z from "zod";
 
-export const Route = createFileRoute("/_private/clinics_/$id/details")({
+export const Route = createFileRoute(
+  "/_private/(clinics)/clinics_/$id/details",
+)({
   component: RouteComponent,
   params: {
     parse: z.object({ id: z.uuid() }).parse,
@@ -30,12 +32,12 @@ export const Route = createFileRoute("/_private/clinics_/$id/details")({
 
 function RouteComponent() {
   const clinic = useLoaderData({
-    from: "/_private/clinics_/$id/details",
+    from: "/_private/(clinics)/clinics_/$id/details",
     strict: true,
   });
   return (
-    <div>
+    <Surface className="p-5">
       <pre>{JSON.stringify(clinic, null, 2)}</pre>
-    </div>
+    </Surface>
   );
 }

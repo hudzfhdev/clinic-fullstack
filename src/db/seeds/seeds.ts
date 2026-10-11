@@ -1,6 +1,7 @@
 import { PRACTITIONERS_SPECIALTIES } from "#/isomorphic/constants/practitioners";
+import { sql } from "drizzle-orm";
 import { db } from "..";
-import { practitioners_specialties } from "../db.schema";
+import { specialtiesTable } from "../db.schema";
 
 export async function seedPractitionerSpecialties() {
   try {
@@ -10,16 +11,29 @@ export async function seedPractitionerSpecialties() {
       )) {
         for (const fieldName of fields) {
           const found = await tx.query.practitioners_specialties.findFirst({
-            where: (col, op) => op.eq(col.name, fieldName),
+            where: {
+              RAW: (table) =>
+                sql`lower(${table.name}) = ${fieldName.toLowerCase()}`,
+            },
           });
           if (found) {
             console.log(`found "${found.name}" in table, skipping...`);
             continue;
           }
+
+          const pascalCaseFieldName = fieldName
+            .split(" ")
+            .map((name) =>
+              /[A-Z]/i.test(name)
+                ? name.charAt(0) + name.slice(1).toLocaleLowerCase()
+                : name,
+            )
+            .join(" ");
+
           const [inserted] = await tx
-            .insert(practitioners_specialties)
+            .insert(specialtiesTable)
             .values({
-              name: fieldName,
+              name: pascalCaseFieldName,
               category,
             })
             .returning();

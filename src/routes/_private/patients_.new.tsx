@@ -12,7 +12,7 @@ import { HouseIcon, TagPlusIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
-import { AppPageLayout } from "#/components/app-layouts.tsx";
+import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { RouteErrorComponent } from "#/components/routeErrorComponent.tsx";
 import { states } from "#/libs/address.ts";
 import { useMemo } from "react";
@@ -34,12 +34,13 @@ export const Route = createFileRoute("/_private/patients_/new")({
 const statesOptions = states.map((v) => ({ label: v.state, value: v.state }));
 
 const defaultValues: CreatePatientSchema = {
-  name: "Pesakit Satu",
-  dob: "25/11/1997",
+  name: "",
+  dob: "",
   gender: "male",
-  identification_card: "971125066591",
+  title: "MR",
+  identification_card: "",
   email: "",
-  phone_number: "0194075542",
+  phone_number: "",
   clinic_id: "",
 };
 
@@ -91,35 +92,51 @@ function RouteComponent() {
               form.handleSubmit(e);
             }}
           >
-            <div className="mb-3 flex gap-4 items-center">
+            <div className="mb-3 flex gap-2 items-center">
               <EntityIcon entity="patients" />
               <Typography type="h3">New Patient</Typography>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex gap-4">
+              <form.AppField
+                name="title"
+                children={(field) => (
+                  <field.AppSelectField
+                    isRequired
+                    className="w-32"
+                    label="Title"
+                    variant="secondary"
+                    options={[
+                      { label: "Mr.", value: "MR" },
+                      { label: "Mrs.", value: "MRS" },
+                    ]}
+                  />
+                )}
+              />
               <form.AppField
                 name="name"
                 children={(field) => (
                   <field.AppTextField
                     isRequired
+                    fullWidth
                     label="Full Name"
                     description="Must follow IC name"
                     variant="secondary"
                   />
                 )}
               />
-
-              <form.AppField
-                name="identification_card"
-                children={(field) => (
-                  <field.AppTextField
-                    isRequired
-                    label="Identification Card (IC)"
-                    variant="secondary"
-                  />
-                )}
-              />
             </div>
+
+            <form.AppField
+              name="identification_card"
+              children={(field) => (
+                <field.AppTextField
+                  isRequired
+                  label="Identification Card (IC)"
+                  variant="secondary"
+                />
+              )}
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <form.AppField

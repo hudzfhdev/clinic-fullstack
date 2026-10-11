@@ -1,8 +1,8 @@
 import { Chip } from "@heroui/react";
-import { CircleCheck, RotateCwFadingClockIcon } from "lucide-react";
+import { CircleCheckIcon, RotateCwFadingClockIcon } from "lucide-react";
 
 const map = {
-  active: { color: "success", icon: CircleCheck, label: "Active" },
+  active: { color: "success", icon: CircleCheckIcon, label: "Active" },
   pending: {
     color: "warning",
     icon: RotateCwFadingClockIcon,

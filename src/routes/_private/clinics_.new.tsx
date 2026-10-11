@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
 import { states } from "#/libs/address";
-import { AppPageLayout } from "#/components/app-layouts.tsx";
+import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { zClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 import type { ClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 
@@ -87,7 +87,7 @@ function RouteComponent() {
               form.handleSubmit(e);
             }}
           >
-            <div className="mb-3 flex gap-4 items-center">
+            <div className="mb-3 flex gap-2 items-center">
               <HospitalIcon />
               <Typography type="h3">New Clinic</Typography>
             </div>

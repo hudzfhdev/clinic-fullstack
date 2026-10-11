@@ -1,5 +1,5 @@
 import { db } from "#/db";
-import { clinics } from "#/db/db.schema";
+import { clinicsTable } from "#/db/db.schema";
 import { zClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 import { ORPCError, os } from "@orpc/server";
 import z from "zod";
@@ -8,7 +8,7 @@ export const createClinic = os
   .input(zClinicCreateSchema)
   .handler(async ({ input }) => {
     const [created] = await db
-      .insert(clinics)
+      .insert(clinicsTable)
       .values({
         name: input.name,
         status: input.status,
@@ -21,6 +21,7 @@ export const createClinic = os
 export const listClinics = os.handler(async () => {
   const listOfClinics = await db.query.clinics.findMany({
     orderBy: (col, op) => op.desc(col.created_at),
+    with: { patients: true },
   });
   return listOfClinics;
 });
