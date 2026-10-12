@@ -12,7 +12,7 @@ A naive and basic implementation of CMS. The goal of building this app to get a 
 DATABASE_URL=''
 ```
 
-3. Make sure to have `NodeJS` version `21` above installed in your machine and `pnpm`.
+3. Make sure to have `NodeJS` version `21`, `pnpm` and `postgresql` version `18` or above installed in your local machine.
 
 4. Open up a terminal and run this command
 
@@ -25,3 +25,9 @@ pnpm dev --open
 ```
 
 5. Finally, it should open a `localhost:3000` app inside your default browser.
+
+## Deployment
+
+### Production
+
+I used [Netlify](https://www.netlify.com/) to host my application in production and [Neon](https://neon.com/) to host my postgres database.
