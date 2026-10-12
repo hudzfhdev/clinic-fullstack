@@ -17,6 +17,9 @@ DATABASE_URL=''
 4. Open up a terminal and run this command
 
 ```bash
+// to insert some seed data into database.
+pnpm seed
+
 pnpm install
 pnpm dev --open
 ```
