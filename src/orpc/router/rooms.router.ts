@@ -8,7 +8,10 @@ import { os } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
+const TAGS = ["Rooms"];
+
 export const createRoom = os
+  .route({ tags: TAGS, summary: "Add Room" })
   .input(zCreateRoomSchema)
   .handler(async ({ input }) => {
     const [created] = await db
@@ -23,6 +26,7 @@ export const createRoom = os
   });
 
 export const listRooms = os
+  .route({ tags: TAGS, summary: "List of Rooms" })
   .output(z.array(zRoomSchema))
   .input(
     z
@@ -35,11 +39,13 @@ export const listRooms = os
       where: input?.filter
         ? { AND: [{ clinic_id: input.filter.clinic_id }] }
         : {},
+      with: { clinic: true },
     });
     return rooms;
   });
 
 export const deleteRoomById = os
+  .route({ method: "DELETE", tags: TAGS, summary: "Delete Room by ID" })
   .input(z.object({ id: z.uuid() }))
   .handler(async ({ input }) => {
     await db.delete(roomsTable).where(eq(roomsTable.id, input.id));

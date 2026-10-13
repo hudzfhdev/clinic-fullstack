@@ -1,4 +1,4 @@
-import { roomsTable, servicesTable } from "#/db/db.schema.ts";
+import { servicesTable } from "#/db/db.schema.ts";
 import { db } from "#/db/index.ts";
 import {
   zCreateServiceSchema,
@@ -9,7 +9,10 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { ClinicServices } from "../services/clinics.services";
 
+const tags = ["Services"];
+
 export const createService = os
+  .route({ tags, summary: "Add Service" })
   .input(zCreateServiceSchema)
   .handler(async ({ input }) => {
     const [created] = await db
@@ -24,6 +27,7 @@ export const createService = os
   });
 
 export const listServices = os
+  .route({ tags, summary: "List of Services" })
   .output(z.array(zServiceSchema))
   .input(
     z
@@ -42,6 +46,7 @@ export const listServices = os
     }
 
     const services = await db.query.services.findMany({
+      with: { clinic: true },
       where: input?.filter
         ? { AND: [{ clinic_id: input.filter.clinic_id }] }
         : {},
@@ -50,6 +55,7 @@ export const listServices = os
   });
 
 export const deleteServiceById = os
+  .route({ method: "DELETE", tags, summary: "Delete Service by ID" })
   .input(z.object({ id: z.uuid() }))
   .handler(async ({ input }) => {
     await db.delete(servicesTable).where(eq(servicesTable.id, input.id));

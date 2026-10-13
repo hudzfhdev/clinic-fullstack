@@ -8,7 +8,7 @@ export class ClinicServices {
     });
   }
 
-  static async findByID({ id }: { id: string }) {
-    return await db.query.clinics.findFirst({ where: { id } });
+  static async findByID({ id }: { id?: string }) {
+    return await db.query.clinics.findFirst({ where: id ? { id } : {} });
   }
 }

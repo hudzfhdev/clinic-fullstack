@@ -11,16 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PrivateRouteImport } from './routes/_private'
-import { Route as PrivateAppointmentsRouteImport } from './routes/_private/appointments'
 import { Route as PrivateDashboardRouteImport } from './routes/_private/dashboard'
 import { Route as PrivateStaffsRouteImport } from './routes/_private/staffs'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as PrivateappointmentsAppointmentsRouteImport } from './routes/_private/(appointments)/appointments'
 import { Route as PrivateclinicsClinicsRouteImport } from './routes/_private/(clinics)/clinics'
 import { Route as PrivatepatientsPatientsRouteImport } from './routes/_private/(patients)/patients'
 import { Route as PrivatepractitionersPractitionersRouteImport } from './routes/_private/(practitioners)/practitioners'
 import { Route as PrivateroomsRoomsRouteImport } from './routes/_private/(rooms)/rooms'
 import { Route as PrivateservicesServicesRouteImport } from './routes/_private/(services)/services'
 import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
+import { Route as PrivateappointmentsAppointmentsNewRouteImport } from './routes/_private/(appointments)/appointments_.new'
 import { Route as PrivateclinicsClinicsIdRouteImport } from './routes/_private/(clinics)/clinics_.$id'
 import { Route as PrivateclinicsClinicsNewRouteImport } from './routes/_private/(clinics)/clinics_.new'
 import { Route as PrivatepatientsPatientsNewRouteImport } from './routes/_private/(patients)/patients_.new'
@@ -42,11 +43,6 @@ const PrivateRoute = PrivateRouteImport.update({
   id: '/_private',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivateAppointmentsRoute = PrivateAppointmentsRouteImport.update({
-  id: '/appointments',
-  path: '/appointments',
-  getParentRoute: () => PrivateRoute,
-} as any)
 const PrivateDashboardRoute = PrivateDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -62,6 +58,12 @@ const ApiSplatRoute = ApiSplatRouteImport.update({
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivateappointmentsAppointmentsRoute =
+  PrivateappointmentsAppointmentsRouteImport.update({
+    id: '/(appointments)/appointments',
+    path: '/appointments',
+    getParentRoute: () => PrivateRoute,
+  } as any)
 const PrivateclinicsClinicsRoute = PrivateclinicsClinicsRouteImport.update({
   id: '/(clinics)/clinics',
   path: '/clinics',
@@ -93,6 +95,12 @@ const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   path: '/api/rpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivateappointmentsAppointmentsNewRoute =
+  PrivateappointmentsAppointmentsNewRouteImport.update({
+    id: '/(appointments)/appointments_/new',
+    path: '/appointments/new',
+    getParentRoute: () => PrivateRoute,
+  } as any)
 const PrivateclinicsClinicsIdRoute = PrivateclinicsClinicsIdRouteImport.update({
   id: '/(clinics)/clinics_/$id',
   path: '/clinics/$id',
@@ -160,16 +168,17 @@ const PrivatepractitionersPractitionersIdDetailsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/appointments': typeof PrivateAppointmentsRoute
   '/dashboard': typeof PrivateDashboardRoute
   '/staffs': typeof PrivateStaffsRoute
   '/api/$': typeof ApiSplatRoute
+  '/appointments': typeof PrivateappointmentsAppointmentsRoute
   '/clinics': typeof PrivateclinicsClinicsRoute
   '/patients': typeof PrivatepatientsPatientsRoute
   '/practitioners': typeof PrivatepractitionersPractitionersRoute
   '/rooms': typeof PrivateroomsRoomsRoute
   '/services': typeof PrivateservicesServicesRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/appointments/new': typeof PrivateappointmentsAppointmentsNewRoute
   '/clinics/$id': typeof PrivateclinicsClinicsIdRouteWithChildren
   '/clinics/new': typeof PrivateclinicsClinicsNewRoute
   '/patients/new': typeof PrivatepatientsPatientsNewRoute
@@ -184,16 +193,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/appointments': typeof PrivateAppointmentsRoute
   '/dashboard': typeof PrivateDashboardRoute
   '/staffs': typeof PrivateStaffsRoute
   '/api/$': typeof ApiSplatRoute
+  '/appointments': typeof PrivateappointmentsAppointmentsRoute
   '/clinics': typeof PrivateclinicsClinicsRoute
   '/patients': typeof PrivatepatientsPatientsRoute
   '/practitioners': typeof PrivatepractitionersPractitionersRoute
   '/rooms': typeof PrivateroomsRoomsRoute
   '/services': typeof PrivateservicesServicesRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/appointments/new': typeof PrivateappointmentsAppointmentsNewRoute
   '/clinics/$id': typeof PrivateclinicsClinicsIdRouteWithChildren
   '/clinics/new': typeof PrivateclinicsClinicsNewRoute
   '/patients/new': typeof PrivatepatientsPatientsNewRoute
@@ -210,16 +220,17 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_private': typeof PrivateRouteWithChildren
-  '/_private/appointments': typeof PrivateAppointmentsRoute
   '/_private/dashboard': typeof PrivateDashboardRoute
   '/_private/staffs': typeof PrivateStaffsRoute
   '/api/$': typeof ApiSplatRoute
+  '/_private/(appointments)/appointments': typeof PrivateappointmentsAppointmentsRoute
   '/_private/(clinics)/clinics': typeof PrivateclinicsClinicsRoute
   '/_private/(patients)/patients': typeof PrivatepatientsPatientsRoute
   '/_private/(practitioners)/practitioners': typeof PrivatepractitionersPractitionersRoute
   '/_private/(rooms)/rooms': typeof PrivateroomsRoomsRoute
   '/_private/(services)/services': typeof PrivateservicesServicesRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/_private/(appointments)/appointments_/new': typeof PrivateappointmentsAppointmentsNewRoute
   '/_private/(clinics)/clinics_/$id': typeof PrivateclinicsClinicsIdRouteWithChildren
   '/_private/(clinics)/clinics_/new': typeof PrivateclinicsClinicsNewRoute
   '/_private/(patients)/patients_/new': typeof PrivatepatientsPatientsNewRoute
@@ -236,16 +247,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/appointments'
     | '/dashboard'
     | '/staffs'
     | '/api/$'
+    | '/appointments'
     | '/clinics'
     | '/patients'
     | '/practitioners'
     | '/rooms'
     | '/services'
     | '/api/rpc/$'
+    | '/appointments/new'
     | '/clinics/$id'
     | '/clinics/new'
     | '/patients/new'
@@ -260,16 +272,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/appointments'
     | '/dashboard'
     | '/staffs'
     | '/api/$'
+    | '/appointments'
     | '/clinics'
     | '/patients'
     | '/practitioners'
     | '/rooms'
     | '/services'
     | '/api/rpc/$'
+    | '/appointments/new'
     | '/clinics/$id'
     | '/clinics/new'
     | '/patients/new'
@@ -285,16 +298,17 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_private'
-    | '/_private/appointments'
     | '/_private/dashboard'
     | '/_private/staffs'
     | '/api/$'
+    | '/_private/(appointments)/appointments'
     | '/_private/(clinics)/clinics'
     | '/_private/(patients)/patients'
     | '/_private/(practitioners)/practitioners'
     | '/_private/(rooms)/rooms'
     | '/_private/(services)/services'
     | '/api/rpc/$'
+    | '/_private/(appointments)/appointments_/new'
     | '/_private/(clinics)/clinics_/$id'
     | '/_private/(clinics)/clinics_/new'
     | '/_private/(patients)/patients_/new'
@@ -331,13 +345,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_private/appointments': {
-      id: '/_private/appointments'
-      path: '/appointments'
-      fullPath: '/appointments'
-      preLoaderRoute: typeof PrivateAppointmentsRouteImport
-      parentRoute: typeof PrivateRoute
-    }
     '/_private/dashboard': {
       id: '/_private/dashboard'
       path: '/dashboard'
@@ -358,6 +365,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$'
       preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_private/(appointments)/appointments': {
+      id: '/_private/(appointments)/appointments'
+      path: '/appointments'
+      fullPath: '/appointments'
+      preLoaderRoute: typeof PrivateappointmentsAppointmentsRouteImport
+      parentRoute: typeof PrivateRoute
     }
     '/_private/(clinics)/clinics': {
       id: '/_private/(clinics)/clinics'
@@ -400,6 +414,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/rpc/$'
       preLoaderRoute: typeof ApiRpcSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_private/(appointments)/appointments_/new': {
+      id: '/_private/(appointments)/appointments_/new'
+      path: '/appointments/new'
+      fullPath: '/appointments/new'
+      preLoaderRoute: typeof PrivateappointmentsAppointmentsNewRouteImport
+      parentRoute: typeof PrivateRoute
     }
     '/_private/(clinics)/clinics_/$id': {
       id: '/_private/(clinics)/clinics_/$id'
@@ -500,14 +521,15 @@ const PrivateclinicsClinicsIdRouteWithChildren =
   )
 
 interface PrivateRouteChildren {
-  PrivateAppointmentsRoute: typeof PrivateAppointmentsRoute
   PrivateDashboardRoute: typeof PrivateDashboardRoute
   PrivateStaffsRoute: typeof PrivateStaffsRoute
+  PrivateappointmentsAppointmentsRoute: typeof PrivateappointmentsAppointmentsRoute
   PrivateclinicsClinicsRoute: typeof PrivateclinicsClinicsRoute
   PrivatepatientsPatientsRoute: typeof PrivatepatientsPatientsRoute
   PrivatepractitionersPractitionersRoute: typeof PrivatepractitionersPractitionersRoute
   PrivateroomsRoomsRoute: typeof PrivateroomsRoomsRoute
   PrivateservicesServicesRoute: typeof PrivateservicesServicesRoute
+  PrivateappointmentsAppointmentsNewRoute: typeof PrivateappointmentsAppointmentsNewRoute
   PrivateclinicsClinicsIdRoute: typeof PrivateclinicsClinicsIdRouteWithChildren
   PrivateclinicsClinicsNewRoute: typeof PrivateclinicsClinicsNewRoute
   PrivatepatientsPatientsNewRoute: typeof PrivatepatientsPatientsNewRoute
@@ -519,15 +541,17 @@ interface PrivateRouteChildren {
 }
 
 const PrivateRouteChildren: PrivateRouteChildren = {
-  PrivateAppointmentsRoute: PrivateAppointmentsRoute,
   PrivateDashboardRoute: PrivateDashboardRoute,
   PrivateStaffsRoute: PrivateStaffsRoute,
+  PrivateappointmentsAppointmentsRoute: PrivateappointmentsAppointmentsRoute,
   PrivateclinicsClinicsRoute: PrivateclinicsClinicsRoute,
   PrivatepatientsPatientsRoute: PrivatepatientsPatientsRoute,
   PrivatepractitionersPractitionersRoute:
     PrivatepractitionersPractitionersRoute,
   PrivateroomsRoomsRoute: PrivateroomsRoomsRoute,
   PrivateservicesServicesRoute: PrivateservicesServicesRoute,
+  PrivateappointmentsAppointmentsNewRoute:
+    PrivateappointmentsAppointmentsNewRoute,
   PrivateclinicsClinicsIdRoute: PrivateclinicsClinicsIdRouteWithChildren,
   PrivateclinicsClinicsNewRoute: PrivateclinicsClinicsNewRoute,
   PrivatepatientsPatientsNewRoute: PrivatepatientsPatientsNewRoute,

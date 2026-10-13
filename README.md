@@ -17,7 +17,7 @@ DATABASE_URL=''
 4. Open up a terminal and run this command
 
 ```bash
-// to insert some seed data into database.
+// MUST: to seed some data into database.
 pnpm seed
 
 pnpm install
@@ -30,4 +30,4 @@ pnpm dev --open
 
 ### Production
 
-I used [Netlify](https://www.netlify.com/) to host my application in production and [Neon](https://neon.com/) to host my postgres database.
+I used [Netlify](https://www.netlify.com/) to host my application and [AppWrite](https://appwrite.io/) to host my postgres database.

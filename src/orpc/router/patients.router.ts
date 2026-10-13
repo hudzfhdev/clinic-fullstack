@@ -8,13 +8,17 @@ import { ORPCError, os } from "@orpc/server";
 import { customAlphabet } from "nanoid";
 import { z } from "zod";
 
+const tags = ["Patients"];
+
 export const listPatients = os
+  .route({ tags, summary: "List of Patients" })
   .output(z.array(zPatientSchema))
   .handler(async () => {
     return await db.query.patients.findMany();
   });
 
 export const createPatient = os
+  .route({ tags, summary: "Add Patient" })
   .input(zCreatePatientSchema)
   .handler(async ({ input }) => {
     const genNanoID = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ")();
@@ -39,6 +43,7 @@ export const createPatient = os
   });
 
 export const getPatientByID = os
+  .route({ tags, summary: "Get Patient by ID" })
   .input(z.object({ id: z.uuid() }))
   .output(zPatientSchema)
   .handler(async (ctx) => {

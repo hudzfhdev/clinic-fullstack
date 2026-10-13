@@ -26,14 +26,13 @@ const handler = new OpenAPIHandler(router, {
       schemaConverters: [new ZodToJsonSchemaConverter()],
       specGenerateOptions: {
         info: {
-          title: "TanStack ORPC Playground",
+          title: "Clinic Management System OpenAPI",
           version: "1.0.0",
         },
         commonSchemas: {
           Clinic: { schema: zClinicSchema },
           Patient: { schema: zPatientSchema },
           Practitioner: { schema: zPractitionerSchema },
-          UndefinedError: { error: "UndefinedError" },
         },
         security: [{ bearerAuth: [] }],
         components: {

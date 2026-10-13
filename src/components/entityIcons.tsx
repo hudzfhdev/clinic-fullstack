@@ -3,8 +3,8 @@ import {
   DoorClosedIcon,
   HospitalIcon,
   IvBagIcon,
+  SquareActivityIcon,
   StethoscopeIcon,
-  ToolboxIcon,
 } from "lucide-react";
 import type { ComponentProps } from "react";
 
@@ -13,7 +13,7 @@ export const mapEntityIcon = {
   patients: IvBagIcon,
   practitioners: StethoscopeIcon,
   rooms: DoorClosedIcon,
-  services: ToolboxIcon,
+  services: SquareActivityIcon,
   appointments: CalendarClockIcon,
 } as const;
 
@@ -24,5 +24,5 @@ export function EntityIcon({
   entity: keyof typeof mapEntityIcon;
 }) {
   const Icon = mapEntityIcon[entity];
-  return <Icon {...props} />;
+  return <Icon {...props} aria-hidden />;
 }

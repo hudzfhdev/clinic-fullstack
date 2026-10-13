@@ -188,11 +188,15 @@ export const relations = defineRelations(
   },
   (r) => ({
     appointments: {
-      patients: r.one.patients({
+      practitioner: r.one.practitioners({
+        from: r.appointments.practitioner_id,
+        to: r.practitioners.id,
+      }),
+      patient: r.one.patients({
         from: r.appointments.patient_id,
         to: r.patients.id,
       }),
-      clinics: r.one.clinics({
+      clinic: r.one.clinics({
         from: r.appointments.clinic_id,
         to: r.clinics.id,
       }),
@@ -204,13 +208,13 @@ export const relations = defineRelations(
       }),
     },
     rooms: {
-      clinics: r.one.clinics({
+      clinic: r.one.clinics({
         from: r.rooms.clinic_id,
         to: r.clinics.id,
       }),
     },
     services: {
-      clinics: r.one.clinics({
+      clinic: r.one.clinics({
         from: r.services.clinic_id,
         to: r.clinics.id,
       }),

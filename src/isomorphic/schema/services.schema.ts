@@ -1,8 +1,11 @@
 import { servicesTable } from "#/db/db.schema.ts";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
+import { zClinicSchema } from "./clinics.schema";
 
-export const zServiceSchema = createSelectSchema(servicesTable);
+export const zServiceSchema = createSelectSchema(servicesTable).extend({
+  clinic: z.nullish(zClinicSchema),
+});
 export type Service = z.infer<typeof zServiceSchema>;
 
 export const zCreateServiceSchema = createInsertSchema(servicesTable).omit({

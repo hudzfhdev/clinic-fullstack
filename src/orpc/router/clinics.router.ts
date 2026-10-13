@@ -4,7 +4,10 @@ import { zClinicCreateSchema } from "#/isomorphic/schema/clinics.schema.ts";
 import { ORPCError, os } from "@orpc/server";
 import z from "zod";
 
+const tags = ["Clinics"];
+
 export const createClinic = os
+  .route({ tags, summary: "Add Clinic" })
   .input(zClinicCreateSchema)
   .handler(async ({ input }) => {
     const [created] = await db
@@ -18,15 +21,18 @@ export const createClinic = os
     return created;
   });
 
-export const listClinics = os.handler(async () => {
-  const listOfClinics = await db.query.clinics.findMany({
-    orderBy: (col, op) => op.desc(col.created_at),
-    with: { patients: true },
+export const listClinics = os
+  .route({ tags, summary: "List of Clinics" })
+  .handler(async () => {
+    const listOfClinics = await db.query.clinics.findMany({
+      orderBy: (col, op) => op.desc(col.created_at),
+      with: { patients: true },
+    });
+    return listOfClinics;
   });
-  return listOfClinics;
-});
 
 export const getClinicByID = os
+  .route({ tags, summary: "Get Clinic by ID" })
   .input(z.object({ clinic_id: z.uuid() }))
   .handler(async ({ input }) => {
     const { clinic_id } = input;

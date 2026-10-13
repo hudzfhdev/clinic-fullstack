@@ -5,14 +5,19 @@ import { practitionersTable } from "#/db/db.schema.ts";
 import { sql } from "drizzle-orm";
 import { zPractitionerCreateSchema } from "#/isomorphic/schema/practitioners.schema.ts";
 
-export const listPractitioners = os.handler(async () => {
-  return await db.query.practitioners.findMany({
-    orderBy: (col, op) => op.desc(col.created_at),
-    with: { clinics: true, practitioners_specialties: true },
+const tags = ["Practitioners"];
+
+export const listPractitioners = os
+  .route({ tags, summary: "List of Practitioners" })
+  .handler(async () => {
+    return await db.query.practitioners.findMany({
+      orderBy: (col, op) => op.desc(col.created_at),
+      with: { clinics: true, practitioners_specialties: true },
+    });
   });
-});
 
 export const getPractitionerByID = os
+  .route({ tags, summary: "Get Practitioner by ID" })
   .input(z.object({ id: z.uuid() }))
   .handler(async ({ input }) => {
     const found = await db.query.practitioners.findFirst({
@@ -26,6 +31,7 @@ export const getPractitionerByID = os
   });
 
 export const createPractitioner = os
+  .route({ tags, summary: "Add Practitioner" })
   .input(zPractitionerCreateSchema)
   .errors({
     UNPROCESSABLE_CONTENT: {
