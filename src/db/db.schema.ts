@@ -113,10 +113,6 @@ export const patientVitalsTable = pgTable("patient_vitals", {
 export const roomsTable = pgTable("rooms", {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
-  status: text()
-    .notNull()
-    .default("idle")
-    .$type<"idle" | "in_used" | "closed">(),
   description: text(),
   clinic_id: uuid()
     .references(() => clinicsTable.id)
@@ -143,6 +139,9 @@ export const appointmentsTable = pgTable("appointments", {
     .notNull(),
   practitioner_id: uuid()
     .references(() => practitionersTable.id)
+    .notNull(),
+  service_id: uuid()
+    .references(() => servicesTable.id)
     .notNull(),
   ...timestamp_tz(),
 });
@@ -189,10 +188,14 @@ export const relations = defineRelations(
   },
   (r) => ({
     appointments: {
-      // patient: r.one.patients({
-      //   from: r.appointments.patient_id,
-      //   to: r.patients.id,
-      // }),
+      patients: r.one.patients({
+        from: r.appointments.patient_id,
+        to: r.patients.id,
+      }),
+      clinics: r.one.clinics({
+        from: r.appointments.clinic_id,
+        to: r.clinics.id,
+      }),
     },
     patient_vitals: {
       patients: r.one.patients({

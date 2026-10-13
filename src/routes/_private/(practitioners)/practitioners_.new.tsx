@@ -24,8 +24,11 @@ import type {
   PractitionerCreateSchema,
 } from "#/isomorphic/schema/practitioners.schema.ts";
 import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
+import { toComboBoxOptions } from "#/components/common/appComboBox.tsx";
 
-export const Route = createFileRoute("/_private/(practitioners)/practitioners_/new")({
+export const Route = createFileRoute(
+  "/_private/(practitioners)/practitioners_/new",
+)({
   component: RouteComponent,
   errorComponent: RouteErrorComponent,
   ssr: "data-only",
@@ -337,7 +340,7 @@ function RouteComponent() {
   );
 }
 
-function PopulateClinicsOptions({
+export function PopulateClinicsOptions({
   children,
 }: {
   children: (params: { clinics: Clinic[] }) => ReactNode;

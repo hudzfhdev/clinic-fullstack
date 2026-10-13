@@ -3,7 +3,11 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 export const zServiceSchema = createSelectSchema(servicesTable);
-export type Room = z.infer<typeof zServiceSchema>;
+export type Service = z.infer<typeof zServiceSchema>;
 
-export const zCreateServiceSchema = createInsertSchema(servicesTable);
-export type CreateRoomSchema = z.infer<typeof zCreateServiceSchema>;
+export const zCreateServiceSchema = createInsertSchema(servicesTable).omit({
+  id: true,
+  updated_at: true,
+  created_at: true,
+});
+export type CreateServiceSchema = z.infer<typeof zCreateServiceSchema>;

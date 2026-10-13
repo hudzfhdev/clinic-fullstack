@@ -80,7 +80,7 @@ function RouteComponent() {
               {(m) => (
                 <Tabs.Tab
                   id="details"
-                  className={cn("w-32 p-0", {
+                  className={cn("w-fit", {
                     "bg-surface": !!m,
                   })}
                 >
@@ -98,7 +98,7 @@ function RouteComponent() {
               {(m) => (
                 <Tabs.Tab
                   id="rooms"
-                  className={cn("w-32 p-0", { "bg-surface": !!m })}
+                  className={cn("w-fit", { "bg-surface": !!m })}
                 >
                   <Link
                     className="w-full h-full flex justify-center items-center"
@@ -114,7 +114,7 @@ function RouteComponent() {
               {(m) => (
                 <Tabs.Tab
                   id="services"
-                  className={cn("w-32 p-0", { "bg-surface": !!m })}
+                  className={cn("w-fit", { "bg-surface": !!m })}
                 >
                   <Link
                     className="w-full h-full flex justify-center items-center"
@@ -129,7 +129,7 @@ function RouteComponent() {
           </Tabs.List>
         </Tabs.ListContainer>
         <Tabs.Panel className="px-0" id={currentTab}>
-          <Surface className="p-5 shadow-xl">
+          <Surface className="p-5">
             <Outlet />
           </Surface>
         </Tabs.Panel>

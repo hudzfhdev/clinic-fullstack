@@ -22,9 +22,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
-      {
-        title: "Clinic",
-      },
+      { title: "Clinic" },
     ],
     links: [
       {
@@ -49,7 +47,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html data-theme="light" className="light" lang="en">
+    <html data-theme="dark" className="dark" lang="en">
       <head>
         <HeadContent />
       </head>

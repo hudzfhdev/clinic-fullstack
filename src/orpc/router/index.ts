@@ -3,6 +3,7 @@ import * as specialtiesRoutes from "./specialties.router";
 import * as practitionerRoutes from "./practitioners.router";
 import * as patientRoutes from "./patients.router";
 import * as roomRoutes from "./rooms.router";
+import * as serviceRoutes from "./services.router";
 
 export default {
   ...clinicRoutes,
@@ -10,4 +11,5 @@ export default {
   ...practitionerRoutes,
   ...patientRoutes,
   ...roomRoutes,
+  ...serviceRoutes,
 };

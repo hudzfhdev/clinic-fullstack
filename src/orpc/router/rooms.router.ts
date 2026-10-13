@@ -17,7 +17,6 @@ export const createRoom = os
         name: input.name,
         description: input.description,
         clinic_id: input.clinic_id,
-        status: input.status,
       })
       .returning();
     return created;
@@ -44,5 +43,5 @@ export const deleteRoomById = os
   .input(z.object({ id: z.uuid() }))
   .handler(async ({ input }) => {
     await db.delete(roomsTable).where(eq(roomsTable.id, input.id));
-    return { message: "Successfully delete room data." };
+    return { message: "Successfully deleted room data." };
   });

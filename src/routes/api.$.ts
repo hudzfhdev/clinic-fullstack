@@ -8,6 +8,9 @@ import { onError } from "@orpc/server";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 
 import router from "#/orpc/router";
+import { zClinicSchema } from "#/isomorphic/schema/clinics.schema.ts";
+import { zPatientSchema } from "#/isomorphic/schema/patients.schema.ts";
+import { zPractitionerSchema } from "#/isomorphic/schema/practitioners.schema.ts";
 
 const handler = new OpenAPIHandler(router, {
   interceptors: [
@@ -27,7 +30,9 @@ const handler = new OpenAPIHandler(router, {
           version: "1.0.0",
         },
         commonSchemas: {
-          // Clinic: { schema: zClinicSchema },
+          Clinic: { schema: zClinicSchema },
+          Patient: { schema: zPatientSchema },
+          Practitioner: { schema: zPractitionerSchema },
           UndefinedError: { error: "UndefinedError" },
         },
         security: [{ bearerAuth: [] }],

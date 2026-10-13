@@ -1,10 +1,10 @@
 import {
-  AmbulanceIcon,
   CalendarClockIcon,
   DoorClosedIcon,
   HospitalIcon,
   IvBagIcon,
   StethoscopeIcon,
+  ToolboxIcon,
 } from "lucide-react";
 import type { ComponentProps } from "react";
 
@@ -13,7 +13,7 @@ export const mapEntityIcon = {
   patients: IvBagIcon,
   practitioners: StethoscopeIcon,
   rooms: DoorClosedIcon,
-  services: AmbulanceIcon,
+  services: ToolboxIcon,
   appointments: CalendarClockIcon,
 } as const;
 

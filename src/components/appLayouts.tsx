@@ -1,15 +1,14 @@
 import { MatchRoute, Link } from "@tanstack/react-router";
-import {
-  Drawer,
-  Button,
-  Link as HeroLink,
-  buttonVariants,
-} from "@heroui/react";
+import { Drawer, Button, Link as HeroLink } from "@heroui/react";
 import { LayoutDashboardIcon, MenuIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ComponentType, PropsWithChildren, SVGProps } from "react";
 import { cn } from "cn";
 import { mapEntityIcon } from "./entityIcons";
+import { AppComboBox, toComboBoxOptions } from "./common/appComboBox";
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "#/orpc/client.ts";
+import { createAtom, useAtom, useSelector } from "@tanstack/react-store";
 
 export function AppPageLayout({
   children,
@@ -39,10 +38,14 @@ export function AppPrivateLayout({ children }: PropsWithChildren) {
 }
 
 function AppHeader({ children }: PropsWithChildren) {
+  const selectedGlobalClinicId = useSelector(selectedGlobalClinicAtom);
+
   return (
     <header className="flex p-3 shadow-md sticky min-h-16 top-0 bg-surface z-10">
       <div className="flex gap-2 items-center">
         <AppSidebar />
+        <SelectGlobalClinic />
+        {selectedGlobalClinicId ?? "No global clinic selected"}
       </div>
       {children}
     </header>
@@ -57,11 +60,18 @@ const navItems: {
   { icon: LayoutDashboardIcon, label: "Dashboard", to: "/dashboard" },
   { icon: mapEntityIcon["clinics"], label: "Clinics", to: "/clinics" },
   {
+    icon: mapEntityIcon["appointments"],
+    label: "Appointments",
+    to: "/appointments",
+  },
+  {
     icon: mapEntityIcon["practitioners"],
     label: "Practitioners",
     to: "/practitioners",
   },
   { icon: mapEntityIcon["patients"], label: "Patients", to: "/patients" },
+  { icon: mapEntityIcon["rooms"], label: "Rooms", to: "/rooms" },
+  { icon: mapEntityIcon["services"], label: "Services", to: "/services" },
 ];
 
 function AppSidebar() {
@@ -118,5 +128,41 @@ function AppSidebar() {
         </Drawer.Content>
       </Drawer.Backdrop>
     </Drawer>
+  );
+}
+
+export const selectedGlobalClinicAtom = createAtom<string | null>(null);
+
+function SelectGlobalClinic() {
+  const [selectedClinic, setSelectedClinic] = useAtom(selectedGlobalClinicAtom);
+  const [error, setError] = useState("");
+  const clinics = useQuery(orpc.listClinics.queryOptions());
+
+  useEffect(() => {
+    if (clinics.isError) {
+      setError("Failed to populate clinics data.");
+    }
+  }, [clinics.isError]);
+
+  if (!clinics.data) {
+    return null;
+  }
+
+  const options = toComboBoxOptions(clinics.data, {
+    labelKey: "name",
+    valueKey: "id",
+  });
+
+  return (
+    <AppComboBox
+      value={selectedClinic}
+      onChange={(v) => setSelectedClinic(v as any)}
+      aria-label="select clinic"
+      placeholder="Select Clinic"
+      variant="secondary"
+      options={options}
+      isInvalid={!!error}
+      error={error}
+    />
   );
 }

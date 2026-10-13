@@ -18,19 +18,21 @@ import {
   useFilter,
   SearchField,
   EmptyState,
+  TextArea,
 } from "@heroui/react";
 import type {
   AutocompleteProps,
   DatePickerProps,
   DateValue,
   SelectProps,
+  TextAreaProps,
   TextFieldProps,
 } from "@heroui/react";
 import type { ComboBoxProps } from "@heroui/react/combo-box";
 import { CalendarDate } from "@internationalized/date";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { ChevronDownIcon, CalendarIcon } from "lucide-react";
-import { Fragment, useMemo } from "react";
+import { useMemo } from "react";
 
 export const formHookContexts = createFormHookContexts();
 
@@ -43,6 +45,7 @@ export const { useAppForm } = createFormHook({
     AppComboBoxField,
     AppDatePickerField,
     AppAutoCompleteField,
+    AppTextAreaField,
   },
   formComponents: {},
 });
@@ -160,6 +163,7 @@ function AppComboBoxField<
   label: string;
   description?: string;
   options: TOption[];
+  /** @deprecated not used */
   allowEmpty?: boolean;
 }) {
   const field = formHookContexts.useFieldContext<any>();
@@ -398,18 +402,18 @@ function AppAutoCompleteField<
             {options.map((option, index) => {
               if ("section" in option) {
                 return (
-                  <Fragment key={option.section}>
-                    <ListBox.Section>
-                      <Header>{option.section}</Header>
-                      {option.items.map((item) => (
-                        <ListBox.Item id={item.value} textValue={item.label}>
-                          {item.label}
-                        </ListBox.Item>
-                      ))}
-                      {index === options.length - 1 ? <Separator /> : null}
-                    </ListBox.Section>
-                    <Separator />
-                  </Fragment>
+                  <ListBox.Section
+                    key={option.section}
+                    className={index > 0 ? "mt-3.5" : ""}
+                  >
+                    <Header>{option.section}</Header>
+                    {option.items.map((item) => (
+                      <ListBox.Item id={item.value} textValue={item.label}>
+                        {item.label}
+                      </ListBox.Item>
+                    ))}
+                    {index === options.length - 1 ? <Separator /> : null}
+                  </ListBox.Section>
                 );
               }
               return (
@@ -422,5 +426,44 @@ function AppAutoCompleteField<
         </Autocomplete.Filter>
       </Autocomplete.Popover>
     </Autocomplete>
+  );
+}
+
+function AppTextAreaField({
+  label,
+  description,
+  placeholder,
+  ...props
+}: TextAreaProps & {
+  label: string;
+  placeholder?: string;
+  description?: string;
+}) {
+  const field = formHookContexts.useFieldContext<any>();
+
+  const error = field.state.meta.errors.find((err) =>
+    err.path.includes(field.name),
+  );
+
+  const isInvalid =
+    !!error?.message &&
+    !field.state.meta.isValid &&
+    field.state.meta.isTouched &&
+    !field.state.meta.isBlurred;
+
+  return (
+    <TextField
+      isInvalid={isInvalid}
+      name={field.name}
+      value={field.state.value}
+      onBlur={field.handleBlur}
+      onChange={(v) => field.handleChange(v)}
+      id={field.name}
+    >
+      <Label>{label}</Label>
+      <TextArea {...props} />
+      {description && <Description>{description}</Description>}
+      <FieldError>{error?.message}</FieldError>
+    </TextField>
   );
 }

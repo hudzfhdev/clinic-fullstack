@@ -15,7 +15,7 @@ import {
   tableFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { EyeIcon, PlusCircleIcon } from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { ClinicStatusChips } from "#/components/modules/clinics/clinicStatusChips.tsx";
 import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { EmptyTable } from "#/components/emptyTable.tsx";
@@ -41,11 +41,9 @@ const columns = columnHelper.columns([
         render={(p) => (
           <span {...p}>
             <Link
-              className="flex gap-2 items-center"
               to={`/clinics/$id/details`}
               params={{ id: props.row.original.id }}
             >
-              <EyeIcon size={17} />
               {props.getValue()}
             </Link>
           </span>
