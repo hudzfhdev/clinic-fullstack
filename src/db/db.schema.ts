@@ -6,6 +6,7 @@ import {
   timestamp,
   jsonb,
   date,
+  pgEnum,
   time,
 } from "drizzle-orm/pg-core";
 
@@ -34,24 +35,39 @@ const address = () =>
     city: string;
   }>();
 
+export const clinicStatusEnum = pgEnum("clinicStatusEnum", [
+  "active",
+  "pending",
+  "inactive",
+]);
 export const clinicsTable = pgTable("clinics", {
   id: uuid().primaryKey().defaultRandom(),
   name: text().unique().notNull(),
-  status: text().$type<"active" | "pending">().notNull().default("active"),
+  status: clinicStatusEnum().notNull(),
   address: address(),
+  start_time: time(),
+  end_time: time(),
+  timezone: text().default("GMT").notNull(),
   ...timestamp_tz(),
 });
 
+export const genderEnum = pgEnum("gender_enum", ["male", "female", "other"]);
+export const titleEnum = pgEnum("title_enum", ["MR", "MRS"]);
+export const practitionerStatusEnum = pgEnum("practitioner_status_enum", [
+  "active",
+  "suspended",
+  "inactive",
+]);
 export const practitionersTable = pgTable("practitioners", {
   id: uuid().primaryKey().defaultRandom(),
-  name: text().unique().notNull(),
-  title: text().notNull().$type<"MR" | "MRS">(),
-  status: text().$type<"active" | "suspended" | "inactive">().notNull(),
-  gender: text().$type<"male" | "female">().notNull(),
+  name: text().notNull(),
+  title: titleEnum().notNull(),
+  status: practitionerStatusEnum().notNull(),
+  gender: genderEnum().notNull(),
   dob: date({ mode: "string" }).notNull(),
   identification_no: text().unique().notNull(),
   address: address(),
-  phone_number: text().unique().notNull(),
+  phone_number: text().notNull(),
   clinic_id: uuid().references(() => clinicsTable.id),
   email: text(),
   specialty_id: uuid()
@@ -69,9 +85,9 @@ export const specialtiesTable = pgTable("practitioners_specialties", {
 
 export const patientsTable = pgTable("patients", {
   id: uuid().defaultRandom().primaryKey(),
-  title: text().notNull().$type<"MR" | "MRS">(),
+  title: titleEnum().notNull(),
   name: text().notNull(),
-  gender: text().$type<"male" | "female" | "other">().notNull(),
+  gender: genderEnum().notNull(),
   dob: date({ mode: "string" }).notNull(),
   patient_no: text().unique().notNull(),
   identification_card: text().unique().notNull(),
@@ -93,7 +109,7 @@ export const patientVitalsTable = pgTable("patient_vitals", {
   patient_id: uuid()
     .references(() => patientsTable.id)
     .notNull(),
-  clinid_id: uuid()
+  clinic_id: uuid()
     .references(() => clinicsTable.id)
     .notNull(),
   ...timestamp_tz(),
@@ -110,24 +126,30 @@ export const patientVitalsTable = pgTable("patient_vitals", {
 //     .notNull(),
 // });
 
+export const roomStatusEnum = pgEnum("room_status", ["available", "closed"]);
 export const roomsTable = pgTable("rooms", {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
   description: text(),
+  status: roomStatusEnum().notNull(),
   clinic_id: uuid()
     .references(() => clinicsTable.id)
     .notNull(),
   ...timestamp_tz(),
 });
 
+export const appointmentStatusEnum = pgEnum("appointment_status", [
+  "pending",
+  "in_queue",
+  "in_progress",
+  "done",
+]);
 export const appointmentsTable = pgTable("appointments", {
   id: uuid().defaultRandom().primaryKey(),
   duration: text().notNull(),
-  start_time: time().notNull(),
-  end_time: time().notNull(),
-  status: text()
-    .notNull()
-    .$type<"pending" | "in_queue" | "in_progress" | "done">(),
+  start_time: date().notNull(),
+  end_time: date().notNull(),
+  status: appointmentStatusEnum().notNull(),
   room_id: uuid()
     .references(() => roomsTable.id)
     .notNull(),
@@ -164,9 +186,14 @@ export const consultationsTable = pgTable("consultations", {
   ...timestamp_tz(),
 });
 
+export const serviceStatusEnum = pgEnum("service_status_enum", [
+  "available",
+  "not_available",
+]);
 export const servicesTable = pgTable("services", {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
+  status: serviceStatusEnum().notNull(),
   description: text(),
   clinic_id: uuid()
     .references(() => clinicsTable.id)

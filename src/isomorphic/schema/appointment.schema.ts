@@ -5,24 +5,16 @@ import { zClinicSchema } from "./clinics.schema";
 import { zPatientSchema } from "./patients.schema";
 import { zPractitionerSchema } from "./practitioners.schema";
 
-const zAppointmentStatusSchema = z.union([
-  z.literal("pending"),
-  z.literal("in_queue"),
-  z.literal("in_progress"),
-  z.literal("done"),
-]);
-export const zAppointmentSchema = createSelectSchema(appointmentsTable, {
-  status: zAppointmentStatusSchema,
-}).extend({
+export const zAppointmentSchema = createSelectSchema(appointmentsTable).extend({
   clinic: z.nullish(zClinicSchema),
   patient: z.nullish(zPatientSchema),
   practitioner: z.nullish(zPractitionerSchema),
 });
 export type Appointment = z.infer<typeof zAppointmentSchema>;
 
-export const zCreateAppointmentSchema = createInsertSchema(appointmentsTable, {
-  status: zAppointmentStatusSchema,
-}).omit({
+export const zCreateAppointmentSchema = createInsertSchema(
+  appointmentsTable,
+).omit({
   id: true,
   created_at: true,
   duration: true,
