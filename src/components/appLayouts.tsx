@@ -18,7 +18,7 @@ export function AppPageLayout({
   return (
     <div
       className={cn(
-        "p-6 bg-background grow",
+        "p-3 bg-background grow",
         { "w-full": isFullWidth },
         className,
       )}

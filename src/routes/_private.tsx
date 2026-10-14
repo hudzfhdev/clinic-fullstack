@@ -1,4 +1,4 @@
-import { AppPrivateLayout, navItems } from "#/components/appLayouts.tsx";
+import { navItems } from "#/components/appLayouts.tsx";
 import { Button, buttonVariants, Separator, Tooltip } from "@heroui/react";
 import {
   createFileRoute,
@@ -9,7 +9,6 @@ import {
 import { createAtom, useSelector } from "@tanstack/react-store";
 import { cn } from "cn";
 import { PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
-import { useState } from "react";
 
 export const Route = createFileRoute("/_private")({
   component: RouteComponent,
@@ -35,7 +34,7 @@ function RouteComponent() {
         aria-label="main navigation"
         data-state={state}
         className={cn(
-          "flex flex-col items-center bg-surface p-2 w-14 transition-[width]",
+          "flex flex-col items-center bg-surface p-2 w-14 transition-[width] border-r border-r-separator",
           {
             "w-64 items-start": state === "expanded",
           },
@@ -44,22 +43,13 @@ function RouteComponent() {
         {/** HEADER */}
         <div
           className={cn(
-            "space-y-2 w-full flex items-end flex-col",
+            "space-y-2 w-full flex items-end flex-col h-12",
             "data-[state='collapsed']:items-center",
           )}
-        >
-          <Button isIconOnly variant="ghost" onClick={toggleSidebar}>
-            {state === "collapsed" ? (
-              <PanelLeftOpenIcon />
-            ) : (
-              <PanelLeftCloseIcon />
-            )}
-          </Button>
-          <Separator />
-        </div>
+        ></div>
 
         {/** NAV */}
-        <div className="flex flex-col mt-5 gap-1 w-full">
+        <div className="flex flex-col gap-1 w-full">
           {navItems.map((nav) => {
             if (state === "collapsed") {
               return (
@@ -95,7 +85,7 @@ function RouteComponent() {
                   <Link
                     className={buttonVariants({
                       variant: match ? "tertiary" : "ghost",
-                      className: "w-full justify-start",
+                      className: "w-full justify-start gap-3",
                     })}
                     to={nav.to}
                   >
@@ -110,6 +100,15 @@ function RouteComponent() {
       </aside>
 
       <main className="grow">
+        <div className="h-14 bg-surface py-5 px-2 flex items-center border-b border-b-separator">
+          <Button isIconOnly variant="ghost" onClick={toggleSidebar}>
+            {state === "collapsed" ? (
+              <PanelLeftOpenIcon />
+            ) : (
+              <PanelLeftCloseIcon />
+            )}
+          </Button>
+        </div>
         <Outlet />
       </main>
     </div>
