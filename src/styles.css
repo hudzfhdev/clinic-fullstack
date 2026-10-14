@@ -1,10 +1,13 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+@import "@fontsource/figtree";
+
 html,
 body {
   height: 100%;
   width: 100%;
+  font-family: "Figtree";
 }
 
 /*
@@ -22,6 +25,9 @@ body {
   /* Border Radius */
   --radius: 0.125rem;
   --field-radius: 0.5rem;
+
+  /* Font */
+  --font-sans: var(--font-figtree);
 }
 
 @layer components {

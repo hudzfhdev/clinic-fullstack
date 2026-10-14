@@ -93,7 +93,7 @@ function RouteComponent() {
         <div className="flex justify-between items-center">
           <div className="grid items-center grid-cols-[35px_auto] grid-rows-1">
             <EntityIcon entity="clinics" aria-hidden />
-            <Typography type="h3">Clinis</Typography>
+            <Typography type="h3">Clinics</Typography>
             <Typography className="col-start-2" type="body" color="muted">
               List of clinics
             </Typography>

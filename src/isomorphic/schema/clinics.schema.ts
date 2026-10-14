@@ -1,19 +1,27 @@
 import { z } from "zod";
-import { zAddressSchema, zTimeStampSchema } from "./utils.schema";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-orm/zod";
+import { clinicsTable } from "#/db/db.schema.ts";
+import { zAddressSchema } from "./utils.schema";
 
-export const zClinicSchema = z
-  .object({
-    id: z.uuid(),
-    name: z.string(),
-    status: z.union([z.literal("active"), z.literal("pending")]),
-    address: z.nullish(zAddressSchema()),
-  })
-  .extend(zTimeStampSchema());
-export type Clinic = z.infer<typeof zClinicSchema>;
-
-export const zClinicCreateSchema = z.object({
-  name: z.string().min(3),
-  status: z.union([z.literal("active"), z.literal("pending")]),
+export const zClinicSchema = createSelectSchema(clinicsTable, {
   address: z.nullish(zAddressSchema()),
 });
+export type Clinic = z.infer<typeof zClinicSchema>;
+
+export const zClinicCreateSchema = createInsertSchema(clinicsTable, {
+  address: z.nullish(zAddressSchema()),
+}).omit({
+  id: true,
+  updated_at: true,
+  created_at: true,
+});
 export type ClinicCreateSchema = z.infer<typeof zClinicCreateSchema>;
+
+export const zUpdateClinicSchema = createUpdateSchema(clinicsTable, {
+  address: z.nullish(zAddressSchema()),
+});
+export type UpdateClinicSchema = z.infer<typeof zUpdateClinicSchema>;
