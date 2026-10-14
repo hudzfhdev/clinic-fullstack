@@ -16,7 +16,7 @@ export function AppPageLayout({
   isFullWidth = true,
 }: PropsWithChildren & { isFullWidth?: boolean; className?: string }) {
   return (
-    <main
+    <div
       className={cn(
         "p-6 bg-background grow",
         { "w-full": isFullWidth },
@@ -24,7 +24,7 @@ export function AppPageLayout({
       )}
     >
       {children}
-    </main>
+    </div>
   );
 }
 
@@ -52,7 +52,7 @@ function AppHeader({ children }: PropsWithChildren) {
   );
 }
 
-const navItems: {
+export const navItems: {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
   to: string;
