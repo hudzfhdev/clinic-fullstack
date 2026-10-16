@@ -1,11 +1,5 @@
 import { navItems } from "#/components/appLayouts.tsx";
-import {
-  Button,
-  buttonVariants,
-  Separator,
-  Tooltip,
-  Typography,
-} from "@heroui/react";
+import { Button, buttonVariants, Tooltip, Typography } from "@heroui/react";
 import {
   createFileRoute,
   Link,
@@ -35,18 +29,18 @@ function RouteComponent() {
   const { state } = useSelector(sidebarAtom);
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className={cn("flex h-full overflow-hidden")}>
       <aside
         aria-label="main navigation"
         data-state={state}
         className={cn(
-          "flex flex-col items-center bg-surface w-14 transition-[width] border-r border-r-separator",
+          "flex flex-col shrink-0 items-center w-14 bg-surface transition-[width] border-r border-r-separator",
           {
             "w-64 items-start": state === "expanded",
           },
         )}
       >
-        {/** HEADER */}
+        {/* Sidebar Header */}
         <div
           className={cn(
             "space-y-2 w-full flex items-end flex-col h-14 border-b border-b-separator",
@@ -54,7 +48,7 @@ function RouteComponent() {
           )}
         ></div>
 
-        {/** NAV */}
+        {/* Sidebar Content */}
         <div className="flex flex-col gap-3 items-center w-full p-4">
           {state === "expanded" ? (
             <Typography className="self-start" color="muted" type="body-sm">
@@ -92,7 +86,7 @@ function RouteComponent() {
               }
 
               return (
-                <MatchRoute to={nav.to} fuzzy={false}>
+                <MatchRoute to={nav.to} fuzzy={false} key={nav.label}>
                   {(match) => (
                     <Link
                       className={buttonVariants({
@@ -114,8 +108,9 @@ function RouteComponent() {
       </aside>
 
       {/** Main content */}
-      <main className="grow overflow-auto relative">
-        <div className="h-14 bg-surface py-5 px-2 flex items-center border-b border-b-separator sticky top-0 z-20">
+      <main className="grow overflow-hidden">
+        {/* Header content */}
+        <div className="h-14 bg-surface py-5 px-2 flex items-center border-b border-b-separator">
           <Button
             isIconOnly
             variant="ghost"

@@ -1,5 +1,5 @@
 import { AppPageLayout } from "#/components/appLayouts.tsx";
-import { Card, Link } from "@heroui/react";
+import { Alert, Card, Link } from "@heroui/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CircleDollarSignIcon } from "lucide-react";
 
@@ -10,31 +10,47 @@ export const Route = createFileRoute("/_private/dashboard")({
 function RouteComponent() {
   return (
     <AppPageLayout>
-      <Card className="w-100">
-        <CircleDollarSignIcon
-          aria-label="Dollar sign icon"
-          className="text-primary size-6"
-          role="img"
-        />
-        <Card.Header>
-          <Card.Title>Become an Acme Creator!</Card.Title>
-          <Card.Description>
-            Visit the Acme Creator Hub to sign up today and start earning
-            credits from your fans and followers.
-          </Card.Description>
-        </Card.Header>
-        <Card.Footer>
-          <Link
-            aria-label="Go to Acme Creator Hub (opens in new tab)"
-            href="https://heroui.com"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Creator Hub
-            <Link.Icon aria-hidden="true" />
-          </Link>
-        </Card.Footer>
-      </Card>
+      <Alert status="warning">
+        <Alert.Indicator />
+        <Alert.Content>
+          <Alert.Title>Scheduled maintenance</Alert.Title>
+          <Alert.Description>
+            Our services will be unavailable on Sunday, March 15th from 2:00 AM
+            to 6:00 AM UTC for scheduled maintenance.
+          </Alert.Description>
+        </Alert.Content>
+      </Alert>
+      <div className="flex flex-wrap gap-4 mt-10">
+        {new Array(3).fill(null).map((_, index) => {
+          return (
+            <Card className="w-100" key={index}>
+              <CircleDollarSignIcon
+                aria-label="Dollar sign icon"
+                className="text-primary size-6"
+                role="img"
+              />
+              <Card.Header>
+                <Card.Title>Become an Acme Creator!</Card.Title>
+                <Card.Description>
+                  Visit the Acme Creator Hub to sign up today and start earning
+                  credits from your fans and followers.
+                </Card.Description>
+              </Card.Header>
+              <Card.Footer>
+                <Link
+                  aria-label="Go to Acme Creator Hub (opens in new tab)"
+                  href="https://heroui.com"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Creator Hub
+                  <Link.Icon aria-hidden="true" />
+                </Link>
+              </Card.Footer>
+            </Card>
+          );
+        })}
+      </div>
     </AppPageLayout>
   );
 }

@@ -9,6 +9,7 @@ import {
   Surface,
   SearchField,
   Link as HeroLink,
+  Tooltip,
 } from "@heroui/react";
 import {
   createColumnHelper,
@@ -21,6 +22,7 @@ import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { EmptyTable } from "#/components/emptyTable.tsx";
 import { EntityIcon } from "#/components/entityIcons.tsx";
 import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
+import { toClientTimeFormat, toReadableTimestamp } from "#/utils/date-time.ts";
 
 export const Route = createFileRoute("/_private/(clinics)/clinics")({
   component: RouteComponent,
@@ -55,10 +57,40 @@ const columns = columnHelper.columns([
     header: "Name",
     cell: (rowInfo) => rowInfo.getValue(),
   }),
+  columnHelper.accessor("start_time", {
+    header: "Opening Time",
+    cell: (info) =>
+      toClientTimeFormat(info.getValue()) || (
+        <Typography type="body-sm" color="muted">
+          Not Available
+        </Typography>
+      ),
+  }),
+  columnHelper.accessor("end_time", {
+    header: "Closing Time",
+    cell: (info) =>
+      toClientTimeFormat(info.getValue()) || (
+        <Typography type="body-sm" color="muted">
+          Not Available
+        </Typography>
+      ),
+  }),
   columnHelper.accessor("status", {
     header: "Status",
     cell(rowInfo) {
       return <ClinicStatusChips status={rowInfo.getValue()} />;
+    },
+  }),
+  columnHelper.accessor("created_at", {
+    header: "Created At",
+    cell({ getValue }) {
+      return toReadableTimestamp(getValue());
+    },
+  }),
+  columnHelper.accessor("updated_at", {
+    header: "Updated At",
+    cell({ getValue }) {
+      return toReadableTimestamp(getValue());
     },
   }),
   columnHelper.display({
@@ -67,12 +99,58 @@ const columns = columnHelper.columns([
     cell: ({ row }) => {
       const { address_one, city, postcode, state, address_two } =
         row.original.address ?? {};
+
+      const address = [address_one, address_two, city, state, postcode]
+        .filter(Boolean)
+        .join(", ");
+
+      if (!address.length) {
+        return (
+          <Typography type="body-sm" color="muted">
+            Not Available
+          </Typography>
+        );
+      }
+
       return (
-        <Typography type="body-sm" truncate>
-          {[address_one, address_two, city, state, postcode]
-            .filter(Boolean)
-            .join(", ")}
-        </Typography>
+        <Tooltip delay={0}>
+          <Tooltip.Trigger>
+            <Typography
+              type="body-sm"
+              truncate
+              className={address ? "max-w-48" : undefined}
+            >
+              {address}
+            </Typography>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
+            <Tooltip.Arrow />
+            <div>
+              <Typography type="body-sm">{address_one},</Typography>
+              {address_two ? (
+                <Typography type="body-sm">{address_two},</Typography>
+              ) : null}
+              <Typography type="body-sm">
+                {city} {postcode},
+              </Typography>
+              <Typography type="body-sm">{state}.</Typography>
+            </div>
+          </Tooltip.Content>
+        </Tooltip>
+      );
+    },
+  }),
+  columnHelper.display({
+    id: "actions",
+    header: "Actions",
+    cell(info) {
+      const { id } = info.row.original;
+      return (
+        <div>
+          <Link to="/clinics/$id/edit" params={{ id }}>
+            Edit
+          </Link>
+        </div>
       );
     },
   }),

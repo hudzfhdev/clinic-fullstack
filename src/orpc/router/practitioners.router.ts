@@ -2,32 +2,39 @@ import { db } from "#/db/index.ts";
 import { ORPCError, os } from "@orpc/server";
 import { z } from "zod";
 import { practitionersTable } from "#/db/db.schema.ts";
-import { sql } from "drizzle-orm";
-import { zPractitionerCreateSchema } from "#/isomorphic/schema/practitioners.schema.ts";
+import {
+  zPractitionerCreateSchema,
+  zPractitionerSchema,
+  zPractitionerUpdateSchema,
+} from "#/isomorphic/schema/practitioners.schema.ts";
+import PractitionerService from "../services/practitioners.services";
+import { eq } from "drizzle-orm";
 
 const tags = ["Practitioners"];
 
 export const listPractitioners = os
   .route({ tags, summary: "List of Practitioners" })
+  .output(z.array(zPractitionerSchema))
   .handler(async () => {
-    return await db.query.practitioners.findMany({
-      orderBy: (col, op) => op.desc(col.created_at),
+    const list = await db.query.practitioners.findMany({
+      orderBy: { created_at: "desc" },
       with: { clinics: true, practitioners_specialties: true },
     });
+    return list;
   });
 
 export const getPractitionerByID = os
   .route({ tags, summary: "Get Practitioner by ID" })
   .input(z.object({ id: z.uuid() }))
+  .output(zPractitionerSchema)
   .handler(async ({ input }) => {
-    const found = await db.query.practitioners.findFirst({
+    const practitioner = await db.query.practitioners.findFirst({
       where: { id: input.id },
-      orderBy: (col, op) => op.desc(col.created_at),
     });
-    if (!found) {
+    if (!practitioner) {
       throw new ORPCError("NOT_FOUND", { message: "Practitioner not found." });
     }
-    return found;
+    return practitioner;
   });
 
 export const createPractitioner = os
@@ -39,10 +46,8 @@ export const createPractitioner = os
     },
   })
   .handler(async ({ input, errors }) => {
-    const exist = await doesPractitionerExist({
+    const exist = await PractitionerService.checkDuplicateIdentification({
       identification_no: input.identification_no,
-      name: input.name,
-      phone_number: input.phone_number,
     });
 
     if (exist) {
@@ -55,64 +60,54 @@ export const createPractitioner = os
     const [newPractitioner] = await db
       .insert(practitionersTable)
       .values({
-        name: input.name,
-        title: input.title,
         dob: input.dob,
         gender: input.gender,
-        address: input.address,
         identification_no: input.identification_no,
+        name: input.name,
         phone_number: input.phone_number,
-        clinic_id: input.clinic_id || null,
         specialty_id: input.specialty_id,
+        clinic_id: input.clinic_id,
         status: input.status,
+        title: input.title,
+        address: input.address,
+        email: input.email,
       })
       .returning();
+
     return newPractitioner;
   });
 
-async function doesPractitionerExist({
-  name,
-  identification_no,
-  phone_number,
-}: {
-  name: string;
-  identification_no: string;
-  phone_number: string;
-}) {
-  const foundName = await db.query.practitioners.findFirst({
-    where: { RAW: (table) => sql`lower(${table.name}) = ${name}` },
-  });
-  if (foundName) {
-    return {
-      errMessage: "Name already exist! Please double check.",
-      errDetails: { path: ["name"] },
-    };
-  }
-
-  const foundIC = await db.query.practitioners.findFirst({
-    where: {
-      RAW: (table) =>
-        sql`lower(${table.identification_no}) = ${identification_no}`,
+export const updatePractitionerById = os
+  .route({ tags, summary: "Update Practitioner by ID", method: "PATCH" })
+  .input(
+    z.object({
+      params: z.object({ id: z.uuid() }),
+      body: zPractitionerUpdateSchema,
+    }),
+  )
+  .errors({
+    UNPROCESSABLE_CONTENT: {
+      data: z.object({ path: z.array(z.string()) }),
     },
-  });
-  if (foundIC) {
-    return {
-      errMessage: "Identification Card already exist! Please double check.",
-      errDetails: { path: ["identification_no"] },
-    };
-  }
+  })
+  .handler(async ({ errors, input }) => {
+    const { body, params } = input;
+    const exist = await PractitionerService.checkDuplicateIdentification({
+      identification_no: body.identification_no,
+      id: params.id,
+    });
 
-  const foundPhone = await db.query.practitioners.findFirst({
-    where: {
-      RAW: (table) => sql`lower(${table.phone_number}) = ${phone_number}`,
-    },
-  });
-  if (foundPhone) {
-    return {
-      errMessage: "Phone number already exist! Please double check.",
-      errDetails: { path: ["phone_number"] },
-    };
-  }
+    if (exist) {
+      throw errors.UNPROCESSABLE_CONTENT({
+        message: exist.errMessage,
+        data: exist.errDetails,
+      });
+    }
+    const [updated] = await db
+      .update(practitionersTable)
+      .set({ ...body })
+      .where(eq(practitionersTable.id, params.id))
+      .returning();
 
-  return null;
-}
+    return updated;
+  });

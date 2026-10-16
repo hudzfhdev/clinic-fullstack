@@ -1,4 +1,5 @@
-import { Chip } from "@heroui/react";
+import type { Clinic } from "#/isomorphic/schema/clinics.schema.ts";
+import { Chip, WarningIcon } from "@heroui/react";
 import type { ChipProps } from "@heroui/react";
 import { CircleCheckIcon, RotateCwFadingClockIcon } from "lucide-react";
 
@@ -9,13 +10,14 @@ const map = {
     icon: RotateCwFadingClockIcon,
     label: "Pending",
   },
+  inactive: { color: "danger", label: "Inactive", icon: WarningIcon },
 } as const;
 
 export function ClinicStatusChips({
   status,
   ...props
 }: Omit<ChipProps, "children"> & {
-  status?: "active" | "pending" | null;
+  status?: Clinic["status"];
 }) {
   const item = status ? map[status] : null;
   if (!item) {

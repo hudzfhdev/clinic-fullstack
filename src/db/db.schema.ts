@@ -45,9 +45,10 @@ export const clinicsTable = pgTable("clinics", {
   name: text().unique().notNull(),
   status: clinicStatusEnum().notNull(),
   address: address(),
-  start_time: time(),
-  end_time: time(),
-  timezone: text().default("GMT").notNull(),
+  start_time: time().notNull(),
+  end_time: time().notNull(),
+  settings: jsonb().$type<{ timezone?: string }>(),
+  deleted_at: timestamp({ mode: "string", withTimezone: true }),
   ...timestamp_tz(),
 });
 

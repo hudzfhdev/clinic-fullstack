@@ -1,4 +1,4 @@
-import { LOCALE_DATEPICKER } from "#/libs/date.ts";
+import { LOCALE_DATEPICKER } from "#/libs/datetime.ts";
 import {
   Description,
   FieldError,
@@ -19,6 +19,7 @@ import {
   SearchField,
   EmptyState,
   TextArea,
+  TimeField,
 } from "@heroui/react";
 import type {
   AutocompleteProps,
@@ -27,9 +28,10 @@ import type {
   SelectProps,
   TextAreaProps,
   TextFieldProps,
+  TimeFieldProps,
 } from "@heroui/react";
 import type { ComboBoxProps } from "@heroui/react/combo-box";
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, Time } from "@internationalized/date";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { ChevronDownIcon, CalendarIcon } from "lucide-react";
 import { useMemo } from "react";
@@ -46,6 +48,7 @@ export const { useAppForm } = createFormHook({
     AppDatePickerField,
     AppAutoCompleteField,
     AppTextAreaField,
+    AppTimeField,
   },
   formComponents: {},
 });
@@ -82,7 +85,6 @@ function AppTextField({
       onBlur={field.handleBlur}
       id={field.name}
       isInvalid={isInvalid}
-      validationBehavior="aria"
     >
       <Label>{label}</Label>
       <Input placeholder={placeholder} />
@@ -465,5 +467,57 @@ function AppTextAreaField({
       {description && <Description>{description}</Description>}
       <FieldError>{error?.message}</FieldError>
     </TextField>
+  );
+}
+
+function AppTimeField({
+  label,
+  description,
+  variant,
+  ...props
+}: TimeFieldProps<Time> & {
+  placeholder?: string;
+  label: string;
+  description?: string;
+} & Pick<TimeField["GroupProps"], "variant">) {
+  const field = formHookContexts.useFieldContext<string>();
+  const error = field.state.meta.errors.find((err) =>
+    err.path.includes(field.name),
+  );
+
+  const isInvalid =
+    !!error?.message &&
+    !field.state.meta.isValid &&
+    field.state.meta.isTouched &&
+    !field.state.meta.isBlurred;
+
+  const value = useMemo(() => {
+    if (!field.state.value) return null;
+    const [hours, minutes] = field.state.value.split(":");
+    return new Time(+hours, +minutes);
+  }, [field.state.value]);
+
+  return (
+    <TimeField
+      {...props}
+      isInvalid={isInvalid}
+      name={field.name}
+      id={field.name}
+      value={value}
+      onBlur={field.handleBlur}
+      onChange={(v) => {
+        console.log({ v });
+        field.handleChange(v ? `${v.hour}:${v.minute}` : "");
+      }}
+    >
+      <Label>{label}</Label>
+      <TimeField.Group variant={variant}>
+        <TimeField.Input>
+          {(segment) => <TimeField.Segment segment={segment} />}
+        </TimeField.Input>
+      </TimeField.Group>
+      {description && <Description>{description}</Description>}
+      <FieldError>{error?.message}</FieldError>
+    </TimeField>
   );
 }

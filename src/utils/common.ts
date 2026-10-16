@@ -1,3 +1,5 @@
+import dayjs from "#/libs/dayjs.ts";
+
 export function sanitizeForm<T extends Record<string, any>>(input: T) {
   const o: T = { ...input };
   for (const k in o) {
@@ -43,8 +45,12 @@ function isObject(item: unknown): item is object {
   return !Array.isArray(item) && typeof item === "object" && !!item;
 }
 
-export function transformTitle<T extends string>(title: T | ({} & string)) {
+export function toReadableTitle<T extends string>(title: T | ({} & string)) {
   if (title === "MR") return "Mr.";
   if (title === "MRS") return "Mrs.";
   return null;
 }
+
+export const isUndefined = (input: unknown): input is undefined => {
+  return input === undefined || typeof input === "undefined";
+};

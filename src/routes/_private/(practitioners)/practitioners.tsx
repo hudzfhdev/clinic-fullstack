@@ -13,6 +13,7 @@ import {
   SearchField,
   Surface,
   Tooltip,
+  linkVariants,
 } from "@heroui/react";
 import {
   createColumnHelper,
@@ -24,7 +25,9 @@ import { AppPageLayout } from "#/components/appLayouts.tsx";
 import { EmptyTable } from "#/components/emptyTable.tsx";
 import { EntityIcon } from "#/components/entityIcons.tsx";
 import type { Practitioner } from "#/isomorphic/schema/practitioners.schema.ts";
-import { transformTitle } from "#/utils/common.ts";
+import { toReadableTitle } from "#/utils/common.ts";
+import { toReadableTimestamp } from "#/utils/date-time.ts";
+import { PractitionerStatusChips } from "#/components/modules/practitioners/practitionerStatusChips.tsx";
 
 export const Route = createFileRoute("/_private/(practitioners)/practitioners")(
   {
@@ -44,6 +47,7 @@ const columns = columnHelper.columns([
     header: "Unique ID",
     cell: (props) => (
       <Link
+        className={linkVariants().base({ className: "w-20" })}
         to="/practitioners/$id/details"
         params={{ id: props.row.original.id }}
       >
@@ -55,11 +59,11 @@ const columns = columnHelper.columns([
   }),
   columnHelper.accessor("title", {
     header: "Title",
-    cell: (rowInfo) => transformTitle(rowInfo.getValue()),
+    cell: (rowInfo) => toReadableTitle(rowInfo.getValue()),
   }),
   columnHelper.accessor("name", {
     header: "Full Name",
-    cell: (rowInfo) => rowInfo.getValue(),
+    cell: (rowInfo) => <div className="w-32">{rowInfo.getValue()}</div>,
   }),
   columnHelper.accessor("identification_no", {
     header: "Identity Card",
@@ -67,7 +71,7 @@ const columns = columnHelper.columns([
   }),
   columnHelper.accessor("status", {
     header: "Status",
-    cell: (info) => info.getValue(),
+    cell: (info) => <PractitionerStatusChips status={info.getValue()} />,
   }),
   columnHelper.accessor("gender", {
     header: "Gender",
@@ -75,7 +79,7 @@ const columns = columnHelper.columns([
   }),
   columnHelper.accessor("dob", {
     header: "Date of Birth",
-    cell: (info) => info.getValue(),
+    cell: (info) => <div className="w-20">{info.getValue()}</div>,
   }),
   columnHelper.accessor("email", {
     header: "Email",
@@ -103,15 +107,37 @@ const columns = columnHelper.columns([
         </Typography>
       ),
   }),
+  columnHelper.accessor("created_at", {
+    header: "Created At",
+    cell({ getValue }) {
+      return toReadableTimestamp(getValue());
+    },
+  }),
+  columnHelper.accessor("updated_at", {
+    header: "Updated At",
+    cell({ getValue }) {
+      return toReadableTimestamp(getValue());
+    },
+  }),
   columnHelper.display({
     id: "address",
     header: "Address",
     cell: ({ row }) => {
       const { address_one, city, postcode, state, address_two } =
         row.original.address ?? {};
+
       const address = [address_one, address_two, city, state, postcode]
         .filter(Boolean)
         .join(", ");
+
+      if (!address.length) {
+        return (
+          <Typography type="body-sm" color="muted">
+            Not Available
+          </Typography>
+        );
+      }
+
       return (
         <Tooltip delay={0}>
           <Tooltip.Trigger>
@@ -137,6 +163,20 @@ const columns = columnHelper.columns([
             </div>
           </Tooltip.Content>
         </Tooltip>
+      );
+    },
+  }),
+  columnHelper.display({
+    id: "actions",
+    header: "Actions",
+    cell(info) {
+      const { id } = info.row.original;
+      return (
+        <div>
+          <Link to="/practitioners/$id/edit" params={{ id }}>
+            Edit
+          </Link>
+        </div>
       );
     },
   }),
