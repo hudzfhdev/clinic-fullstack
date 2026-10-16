@@ -28,6 +28,7 @@ pnpm dev --open
 
 ## Deployment
 
-### Production
+### Production (Still in Planning Phase)
 
-I used [Netlify](https://www.netlify.com/) to host my application and [AppWrite](https://appwrite.io/) to host my postgres database.
+1. [Netlify](https://www.netlify.com/) to host full stack application. **(PENDING)**
+2. [AppWrite](https://appwrite.io/) to host postgres database. **(PENDING)**
