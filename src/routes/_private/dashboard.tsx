@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_private/dashboard")({
 
 function RouteComponent() {
   return (
-    <AppPageLayout>
+    <AppPageLayout className="space-y-5">
       <Alert status="warning">
         <Alert.Indicator />
         <Alert.Content>
@@ -20,10 +20,10 @@ function RouteComponent() {
           </Alert.Description>
         </Alert.Content>
       </Alert>
-      <div className="flex flex-wrap gap-4 mt-10">
+      <div className="flex gap-4">
         {new Array(3).fill(null).map((_, index) => {
           return (
-            <Card className="w-100" key={index}>
+            <Card key={index}>
               <CircleDollarSignIcon
                 aria-label="Dollar sign icon"
                 className="text-primary size-6"

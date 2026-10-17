@@ -1,3 +1,7 @@
+import type {
+  PatientContact,
+  PatientEmergencyContact,
+} from "#/isomorphic/schema/patients.schema.ts";
 import { defineRelations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -93,8 +97,9 @@ export const patientsTable = pgTable("patients", {
   patient_no: text().unique().notNull(),
   identification_card: text().unique().notNull(),
   address: address(),
-  phone_number: text().unique().notNull(),
   email: text(),
+  contacts: jsonb().$type<PatientContact[]>().notNull(),
+  emergency_contacts: jsonb().$type<PatientEmergencyContact[]>(),
   clinic_id: uuid()
     .references(() => clinicsTable.id)
     .notNull(),

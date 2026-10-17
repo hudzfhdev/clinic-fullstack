@@ -108,7 +108,7 @@ function RouteComponent() {
       </aside>
 
       {/** Main content */}
-      <main className="grow overflow-hidden">
+      <main className="grow overflow-hidden flex flex-col">
         {/* Header content */}
         <div className="h-14 bg-surface py-5 px-2 flex items-center border-b border-b-separator">
           <Button

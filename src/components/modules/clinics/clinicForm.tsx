@@ -6,21 +6,20 @@ import type {
   ClinicCreateSchema as ClinicFormSchema,
 } from "#/isomorphic/schema/clinics.schema.ts";
 import { states } from "#/libs/address.ts";
-import { Button, buttonVariants, Form, Typography } from "@heroui/react";
-import { Link } from "@tanstack/react-router";
+import { Button, Form, Typography } from "@heroui/react";
 import { Clock9Icon, HouseIcon } from "lucide-react";
 
 type ClinicFormProps<TFormValue> = {
   onSubmit: (value: TFormValue) => void;
   clinicData?: Clinic;
-  isSubmitting?: boolean;
+  isMutating?: boolean;
 };
 
 const statesOptions = states.map((v) => ({ label: v.state, value: v.state }));
 
 export function ClinicForm({
   onSubmit,
-  isSubmitting,
+  isMutating,
   clinicData,
 }: ClinicFormProps<ClinicFormSchema>) {
   const mode = clinicData ? "edit" : "new";
@@ -169,15 +168,15 @@ export function ClinicForm({
             />
           </div>
         </div>
-        <div className="flex justify-end gap-2">
-          <Link to="/clinics" className={buttonVariants({ variant: "ghost" })}>
-            Back
-          </Link>
+        <div className="flex justify-end gap-2 mt-5">
+          <Button type="reset" variant="ghost">
+            Reset
+          </Button>
           <form.Subscribe selector={(s) => [s.isValid, s.canSubmit, s.isDirty]}>
             {([isValid, canSubmit, isDirty]) => (
               <Button
                 type="submit"
-                isDisabled={isSubmitting || !canSubmit || !isValid || !isDirty}
+                isDisabled={isMutating || !canSubmit || !isValid || !isDirty}
               >
                 Submit
               </Button>

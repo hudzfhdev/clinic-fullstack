@@ -49,7 +49,7 @@ function RouteComponent() {
     <AppPageLayout className="grid place-items-center">
       <Surface className="w-full md:max-w-2xl xl:max-w-3xl p-6">
         <ClinicForm
-          isSubmitting={clinicsMutation.isPending}
+          isMutating={clinicsMutation.isPending}
           onSubmit={(value) =>
             clinicsMutation.mutate(
               sanitizeForm({

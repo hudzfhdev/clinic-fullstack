@@ -5,8 +5,8 @@ import {
   zPatientSchema,
 } from "#/isomorphic/schema/patients.schema.ts";
 import { ORPCError, os } from "@orpc/server";
-import { customAlphabet } from "nanoid";
 import { z } from "zod";
+import PatientServices from "../services/patients.services";
 
 const tags = ["Patients"];
 
@@ -19,24 +19,23 @@ export const listPatients = os
 
 export const createPatient = os
   .route({ tags, summary: "Add Patient" })
-  .input(zCreatePatientSchema)
-  .handler(async ({ input }) => {
-    const genNanoID = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ")();
-    const patient_no = `PMC-${genNanoID}`;
-
+  .input(z.object({ body: zCreatePatientSchema }))
+  .handler(async ({ input: { body } }) => {
+    const patient_no = PatientServices.genPatientNo();
     const [newPatient] = await db
       .insert(patientsTable)
       .values({
-        clinic_id: input.clinic_id,
-        title: input.title,
-        dob: input.dob,
-        gender: input.gender,
-        identification_card: input.identification_card,
-        name: input.name,
+        clinic_id: body.clinic_id,
+        title: body.title,
+        dob: body.dob,
+        gender: body.gender,
+        identification_card: body.identification_card,
+        name: body.name,
         patient_no: patient_no,
-        phone_number: input.phone_number,
-        address: input.address,
-        email: input.email,
+        address: body.address,
+        email: body.email,
+        emergency_contacts: body.emergency_contacts,
+        contacts: body.contacts,
       })
       .returning();
     return newPatient;

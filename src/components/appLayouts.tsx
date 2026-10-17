@@ -14,12 +14,17 @@ export function AppPageLayout({
   children,
   className,
   isFullWidth = true,
-}: PropsWithChildren & { isFullWidth?: boolean; className?: string }) {
+  isFullHeight = true,
+}: PropsWithChildren & {
+  isFullHeight?: boolean;
+  isFullWidth?: boolean;
+  className?: string;
+}) {
   return (
     <div
       className={cn(
-        "px-6 py-6 pb-20 bg-background grow h-full overflow-auto",
-        { "w-full": isFullWidth },
+        "px-6 py-6 bg-background grow overflow-auto",
+        { "w-full": isFullWidth, "h-full": !isFullHeight },
         className,
       )}
     >
@@ -58,12 +63,12 @@ export const navItems: {
   to: string;
 }[] = [
   { icon: LayoutDashboardIcon, label: "Dashboard", to: "/dashboard" },
-  { icon: mapEntityIcon["clinics"], label: "Clinics", to: "/clinics" },
   {
     icon: mapEntityIcon["appointments"],
     label: "Appointments",
     to: "/appointments",
   },
+  { icon: mapEntityIcon["clinics"], label: "Clinics", to: "/clinics" },
   {
     icon: mapEntityIcon["practitioners"],
     label: "Practitioners",

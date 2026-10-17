@@ -3,12 +3,21 @@ import { useAppForm } from "#/components/forms/forms.util";
 import {
   Button,
   buttonVariants,
+  EmptyState,
   Form,
+  Modal,
   Surface,
   toast,
   Typography,
 } from "@heroui/react";
-import { HouseIcon, TagPlusIcon } from "lucide-react";
+import {
+  DatabaseIcon,
+  HouseIcon,
+  PhoneIcon,
+  PlusCircleIcon,
+  PlusIcon,
+  TagPlusIcon,
+} from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { orpc } from "#/orpc/client";
 import { sanitizeForm } from "#/utils/common";
@@ -40,7 +49,7 @@ const defaultValues: CreatePatientSchema = {
   title: "MR",
   identification_card: "",
   email: "",
-  phone_number: "",
+  contacts: [],
   clinic_id: "",
 };
 
@@ -52,7 +61,7 @@ function RouteComponent() {
     defaultValues,
     onSubmit({ value }) {
       console.log("submitted", value, sanitizeForm(value));
-      patientMutation.mutate(sanitizeForm(value));
+      patientMutation.mutate({ body: sanitizeForm(value) });
     },
     validators: {
       onChangeAsync: zCreatePatientSchema,
@@ -83,7 +92,7 @@ function RouteComponent() {
 
   return (
     <AppPageLayout className="grid place-items-center">
-      <Surface className="w-full md:max-w-2xl xl:max-w-3xl p-6 rounded-xl shadow-xl">
+      <Surface className="w-full md:max-w-2xl xl:max-w-3xl p-6">
         <form.AppForm>
           <Form
             className="flex flex-col gap-4"
@@ -96,7 +105,6 @@ function RouteComponent() {
               <EntityIcon entity="patients" />
               <Typography type="h3">New Patient</Typography>
             </div>
-
             <div className="flex gap-4">
               <form.AppField
                 name="title"
@@ -126,7 +134,6 @@ function RouteComponent() {
                 )}
               />
             </div>
-
             <form.AppField
               name="identification_card"
               children={(field) => (
@@ -137,7 +144,6 @@ function RouteComponent() {
                 />
               )}
             />
-
             <div className="grid grid-cols-2 gap-4">
               <form.AppField
                 name="gender"
@@ -170,25 +176,49 @@ function RouteComponent() {
                 )}
               />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <form.AppField
-                name="phone_number"
-                children={(field) => (
-                  <field.AppTextField
-                    isRequired
-                    label="Phone Number"
-                    variant="secondary"
-                  />
-                )}
-              />
-
-              <form.AppField
-                name="email"
-                children={(field) => (
-                  <field.AppTextField label="Email" variant="secondary" />
-                )}
-              />
+            <form.AppField
+              name="email"
+              children={(field) => (
+                <field.AppTextField label="Email" variant="secondary" />
+              )}
+            />
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b py-2 border-b-accent-soft">
+                <PhoneIcon size={17} />
+                <Typography>Personal Contacts</Typography>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <form.AppField name="contacts" mode="array">
+                  {(field) => {
+                    if (!field.state.value.length) {
+                      return (
+                        <EmptyState className="bg-surface-secondary flex min-h-50 col-span-2 flex-col items-center justify-center gap-4 text-center">
+                          <PhoneIcon className="size-6 text-muted" />
+                          <span className="text-sm text-muted">
+                            No Personal Contacts Added.
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={() => {
+                              field.pushValue({
+                                country_code: "",
+                                is_primary: false,
+                                phone_number: "",
+                                type: "phone",
+                              });
+                            }}
+                          >
+                            <PlusIcon />
+                            Add
+                          </Button>
+                        </EmptyState>
+                      );
+                    }
+                    return <div>hehe</div>;
+                  }}
+                </form.AppField>
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -204,8 +234,8 @@ function RouteComponent() {
                     <PopulateClinicsOptions>
                       {({ clinics }) => (
                         <field.AppComboBoxField
-                          allowEmpty
                           variant="secondary"
+                          isRequired
                           label="Clinic"
                           options={clinics.map((v) => ({
                             label: v.name,
@@ -269,15 +299,27 @@ function RouteComponent() {
                 />
               </div>
             </div>
-
-            <div className="flex justify-end gap-2">
-              <Link
-                to="/patients"
-                className={buttonVariants({ variant: "ghost" })}
+            <div className="flex justify-end gap-2 mt-5">
+              <Button type="reset" variant="ghost">
+                Reset
+              </Button>
+              <form.Subscribe
+                selector={(s) => [s.isValid, s.canSubmit, s.isDirty]}
               >
-                Back
-              </Link>
-              <Button type="submit">Submit</Button>
+                {([isValid, canSubmit, isDirty]) => (
+                  <Button
+                    type="submit"
+                    isDisabled={
+                      patientMutation.isPending ||
+                      !canSubmit ||
+                      !isValid ||
+                      !isDirty
+                    }
+                  >
+                    Submit
+                  </Button>
+                )}
+              </form.Subscribe>
             </div>
           </Form>
         </form.AppForm>
@@ -292,7 +334,7 @@ function PopulateClinicsOptions({
   children: (params: { clinics: Clinic[] }) => ReactNode;
 }) {
   const { data, isError, isLoading } = useQuery(
-    orpc.listClinics.queryOptions(),
+    orpc.listClinics.queryOptions({ input: { filters: { status: "active" } } }),
   );
 
   if (isError || isLoading || !data) {
@@ -300,28 +342,4 @@ function PopulateClinicsOptions({
   }
 
   return children({ clinics: data });
-}
-
-type Option = { label: string; value: string }[];
-function PopulateSpecialtiesOptions({
-  children,
-}: {
-  children: (params: { options: Option[] }) => ReactNode;
-}) {
-  const { data, isError, isLoading } = useQuery(
-    orpc.populateSpecialtiesOptions.queryOptions(),
-  );
-
-  const options = useMemo(() => {
-    if (!data) return [];
-    return data.flatMap<Option>((o) => {
-      return o.fields.map((field) => ({ label: field.name, value: field.id }));
-    });
-  }, [data]);
-
-  if (isError || isLoading || !data) {
-    return null;
-  }
-
-  return children({ options });
 }

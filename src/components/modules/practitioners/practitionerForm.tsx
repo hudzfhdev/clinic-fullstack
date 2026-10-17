@@ -10,15 +10,9 @@ import type {
 import { states } from "#/libs/address.ts";
 import { toClientDateFormat } from "#/libs/datetime.ts";
 import { orpc } from "#/orpc/client.ts";
-import { Button, buttonVariants, Form, Typography } from "@heroui/react";
+import { Button, Form, Typography } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import {
-  ChevronLeftIcon,
-  CircleAlertIcon,
-  HouseIcon,
-  TagPlusIcon,
-} from "lucide-react";
+import { CircleAlertIcon, HouseIcon, TagPlusIcon } from "lucide-react";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 
@@ -68,17 +62,6 @@ export function PractitionerForm({
           form.handleSubmit(e);
         }}
       >
-        <Link
-          to="/practitioners"
-          className={buttonVariants({
-            variant: "ghost",
-            size: "sm",
-            className: "mb-2",
-          })}
-        >
-          <ChevronLeftIcon />
-          Back
-        </Link>
         <div className="mb-3 flex gap-2 items-center">
           <EntityIcon entity="practitioners" />
           <Typography type="h3">

@@ -65,7 +65,7 @@ function RouteComponent() {
               body: sanitizeForm({ ...clinicData, ...value }),
             })
           }
-          isSubmitting={isPending}
+          isMutating={isPending}
         />
       </Surface>
     </AppPageLayout>

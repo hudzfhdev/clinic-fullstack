@@ -28,6 +28,7 @@ import type { Practitioner } from "#/isomorphic/schema/practitioners.schema.ts";
 import { toReadableTitle } from "#/utils/common.ts";
 import { toReadableTimestamp } from "#/utils/date-time.ts";
 import { PractitionerStatusChips } from "#/components/modules/practitioners/practitionerStatusChips.tsx";
+import { capitalize } from "#/utils/string.ts";
 
 export const Route = createFileRoute("/_private/(practitioners)/practitioners")(
   {
@@ -75,7 +76,7 @@ const columns = columnHelper.columns([
   }),
   columnHelper.accessor("gender", {
     header: "Gender",
-    cell: (info) => info.getValue(),
+    cell: (info) => capitalize(info.getValue()),
   }),
   columnHelper.accessor("dob", {
     header: "Date of Birth",
